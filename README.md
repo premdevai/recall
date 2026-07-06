@@ -76,6 +76,16 @@ Then, in any repository, ask Claude Code:
 Recall scopes the run, reads your history, pulls from whichever MCP sources you have connected,
 and renders the page or Markdown.
 
+**Updating.** A skill file is a static copy, not a live link, so updates are pull-based. Re-run
+with the `@latest` tag — the tag is what forces npx past its cache to fetch the newest published
+version; without it you may just re-run a cached copy:
+
+```bash
+npx @premdevai/recall@latest
+```
+
+This overwrites `SKILL.md` and `template.html` in place — no uninstall needed.
+
 ### Option B — copy the skill by hand
 
 No Node? Drop [`skill/SKILL.md`](skill/SKILL.md) into `~/.claude/skills/recall/` yourself:

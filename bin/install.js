@@ -6,6 +6,7 @@
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
+const pkg = require("../package.json");
 
 const args = process.argv.slice(2);
 if (args.includes("-h") || args.includes("--help")) {
@@ -39,8 +40,9 @@ copied.forEach(function (f) {
   fs.copyFileSync(path.join(srcDir, f), path.join(base, f));
 });
 
-console.log("Recall skill installed:");
+console.log("Recall v" + pkg.version + " installed:");
 console.log("  " + base + "  (" + copied.join(", ") + ")");
 console.log("");
 console.log("Next: open Claude Code in any repo and run  /recall");
 console.log("It reuses your existing git and MCP connections — no keys, no config.");
+console.log("Update later with:  npx @premdevai/recall@latest");
