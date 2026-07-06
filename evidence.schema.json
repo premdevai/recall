@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/premdevai/recall/blob/main/evidence.schema.json",
+  "title": "Recall evidence model",
+  "description": "The single dataset Recall extracts from git and connected MCP sources. Every source adapter WRITES this shape; every renderer (HTML, Markdown, ...) READS it. Add a source or a format by conforming to this contract without touching the other side.",
+  "type": "object",
+  "required": ["subject", "accomplishments"],
+  "additionalProperties": false,
+  "properties": {
+    "subject": {
+      "type": "object",
+      "description": "Who and what this record is about.",
+      "required": ["engineer", "repo"],
+      "additionalProperties": false,
+      "properties": {
+        "engineer": { "type": "string", "description": "Display name of the engineer." },
+        "repo": { "type": "string", "description": "Repository or product identifier, e.g. \"acme/web\"." },
+        "tenure": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "from": { "type": "string", "format": "date", "description": "First contribution (ISO date)." },
+            "to": { "type": "string", "format": "date", "description": "Last contribution (ISO date)." }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "description": "Which source adapters actually contributed data to this run.",
+          "items": { "type": "string", "enum": ["git", "github", "gitlab", "bitbucket", "jira", "linear", "datadog", "ci"] }
+        },
+        "generatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "stats": {
+      "type": "object",
+      "description": "Headline totals for the summary tiles. All optional — populate whatever the connected sources can prove.",
+      "additionalProperties": false,
+      "properties": {
+        "commits": { "type": "integer", "minimum": 0 },
+        "prsMerged": { "type": "integer", "minimum": 0 },
+        "issuesClosed": { "type": "integer", "minimum": 0 },
+        "reviewComments": { "type": "integer", "minimum": 0 },
+        "linesAdded": { "type": "integer", "minimum": 0 },
+        "linesRemoved": { "type": "integer", "minimum": 0 },
+        "releases": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "skills": {
+      "type": "array",
+      "description": "Competency table. Counts are derived from real records, never a self-assessed 0-100 score.",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "description": "e.g. \"React\", \"Performance\"." },
+          "subtitle": { "type": "string", "description": "Concrete facets, e.g. \"components · hooks · context\"." },
+          "prs": { "type": "integer", "minimum": 0, "description": "Merged PRs attributed to this skill." },
+          "commits": { "type": "integer", "minimum": 0 },
+          "lastTouched": { "type": "string", "description": "Human label (\"3 days ago\") or ISO date." },
+          "activity": {
+            "type": "object",
+            "description": "Time-bucketed activity trace, drives the sparkline.",
+            "additionalProperties": false,
+            "properties": {
+              "unit": { "type": "string", "enum": ["week", "month", "quarter"], "default": "quarter" },
+              "from": { "type": "string", "description": "Label of the first bucket, e.g. \"Q3 '23\"." },
+              "to": { "type": "string", "description": "Label of the last bucket." },
+              "values": { "type": "array", "items": { "type": "number", "minimum": 0 }, "description": "One value per bucket, oldest first." }
+            }
+          }
+        }
+      }
+    },
+
+    "phases": {
+      "type": "array",
+      "description": "The narrative arc — chapters the timeline groups accomplishments into. Optional; if absent, renderers fall back to chronological order.",
+      "items": {
+        "type": "object",
+        "required": ["key", "title"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string", "description": "Stable id referenced by accomplishment.phase, e.g. \"act-1\"." },
+          "title": { "type": "string", "description": "e.g. \"Learning the terrain\"." },
+          "from": { "type": "string", "format": "date" },
+          "to": { "type": "string", "format": "date" },
+          "narrative": { "type": "string", "description": "One or two sentences on what changed in this phase." }
+        }
+      }
+    },
+
+    "accomplishments": {
+      "type": "array",
+      "description": "The core: merged commits/PRs/tickets rolled up into showcaseable units. This is the only required list.",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "title", "confidence", "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "description": "Stable unique id." },
+          "category": { "type": "string", "description": "Skill area, e.g. \"Performance\". Should match a skills[].name where possible." },
+          "title": { "type": "string" },
+          "phase": { "type": "string", "description": "References a phases[].key." },
+          "date": { "type": "string", "format": "date", "description": "Representative date (e.g. merge date), for the timeline." },
+          "star": {
+            "type": "object",
+            "description": "The STAR story. Result uses REAL measured numbers when a source provides them; otherwise describe the change without inventing figures.",
+            "additionalProperties": false,
+            "properties": {
+              "situation": { "type": "string" },
+              "task": { "type": "string" },
+              "action": { "type": "string" },
+              "result": { "type": "string" }
+            }
+          },
+          "resumeBullet": { "type": "string", "description": "One crisp line ready to paste into a résumé." },
+          "confidence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Résumé-worthiness. Typo/format ~2; shipped feature with measured impact ~90+. Renderers filter and rank on this."
+          },
+          "evidence": {
+            "type": "array",
+            "description": "Proof. At least one item — a claim without evidence does not belong here.",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["type", "ref"],
+              "additionalProperties": false,
+              "properties": {
+                "type": { "type": "string", "enum": ["commit", "pr", "issue", "ticket", "review", "metric", "deploy"] },
+                "ref": { "type": "string", "description": "sha, PR/issue number, ticket key, dashboard name..." },
+                "url": { "type": "string", "format": "uri", "description": "Optional deep link." },
+                "detail": { "type": "string", "description": "For type=metric: the measurement, e.g. \"p75 5.2s → 2.1s\"." }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "ledger": {
+      "type": "array",
+      "description": "The long-tail inventory: capabilities grouped by skill, phrased as résumé-ready fragments. A flat, low-ceremony companion to accomplishments.",
+      "items": {
+        "type": "object",
+        "required": ["group", "items"],
+        "additionalProperties": false,
+        "properties": {
+          "group": { "type": "string", "description": "Skill heading, e.g. \"Performance\"." },
+          "items": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

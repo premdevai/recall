@@ -41,6 +41,10 @@ stories, and scored so the typo fixes stay off your résumé.
 Extract once into a single evidence model; render as many formats as you like. Every MCP source
 is just an adapter that maps its records onto that model — add one without touching the renderers.
 
+The model is a documented contract: [`evidence.schema.json`](evidence.schema.json) (JSON Schema),
+with a filled-in [`examples/evidence.json`](examples/evidence.json). A new **source adapter**
+writes this shape; a new **renderer** reads it. That's the whole extension surface.
+
 ## Install
 
 ### Option A — Claude Code skill (recommended, zero dependencies)
