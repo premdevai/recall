@@ -1,0 +1,577 @@
+<title>Maya Ellison — Three Years in cobalt-web</title>
+<style>
+  :root {
+    --bg: #0e0d0b; --bg-2: #141210; --panel: #191612; --line: #2a2620;
+    --ink: #ece6d8; --muted: #8f867a; --faint: #5f594f;
+    --accent: #d29a4a; --accent-hi: #e8bd7a; --accent-dim: #7a5c2e;
+    --shadow: 0 24px 60px -30px rgba(0,0,0,.7);
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    --maxw: 1180px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f3ece0; --bg-2: #efe7d8; --panel: #fbf6ec; --line: #ddd2bf;
+      --ink: #2a251d; --muted: #6f6656; --faint: #a89c86;
+      --accent: #b07a26; --accent-hi: #8f6119; --accent-dim: #d8c39a;
+      --shadow: 0 24px 60px -34px rgba(80,60,20,.28);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e0d0b; --bg-2: #141210; --panel: #191612; --line: #2a2620;
+    --ink: #ece6d8; --muted: #8f867a; --faint: #5f594f;
+    --accent: #d29a4a; --accent-hi: #e8bd7a; --accent-dim: #7a5c2e;
+    --shadow: 0 24px 60px -30px rgba(0,0,0,.7);
+  }
+  :root[data-theme="light"] {
+    --bg: #f3ece0; --bg-2: #efe7d8; --panel: #fbf6ec; --line: #ddd2bf;
+    --ink: #2a251d; --muted: #6f6656; --faint: #a89c86;
+    --accent: #b07a26; --accent-hi: #8f6119; --accent-dim: #d8c39a;
+    --shadow: 0 24px 60px -34px rgba(80,60,20,.28);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); line-height: 1.6;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  /* fixed grain — never on a scrolling container */
+  .grain {
+    position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: .04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  /* progress bar */
+  .progress { position: fixed; top: 0; left: 0; height: 2px; width: 0; background: var(--accent); z-index: 120; transition: width .1s linear; }
+
+  /* theme toggle */
+  .toggle {
+    position: fixed; top: 18px; right: 20px; z-index: 130;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); background: var(--panel); border: 1px solid var(--line);
+    border-radius: 999px; padding: 8px 14px; cursor: pointer; transition: transform .15s, color .2s, border-color .2s;
+  }
+  .toggle:hover { color: var(--accent); border-color: var(--accent-dim); }
+  .toggle:active { transform: scale(.96); }
+  .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 18px;
+  }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ---- reveal ---- */
+  [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); transition-delay: calc(var(--i, 0) * 80ms); }
+  [data-reveal].in { opacity: 1; transform: none; }
+
+  /* ---- HERO ---- */
+  .hero { position: relative; padding: 130px 0 90px; }
+  .hero-grid { display: grid; grid-template-columns: 1.35fr .95fr; gap: 56px; align-items: end; }
+  .hero h1 {
+    font-size: clamp(2.6rem, 6.2vw, 5rem); line-height: .96; letter-spacing: -.03em;
+    font-weight: 800; margin: 0 0 22px; text-wrap: balance;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero .lede { font-size: 1.12rem; color: var(--muted); max-width: 46ch; margin: 0; }
+  .hero .meta { display: flex; gap: 26px; margin-top: 30px; flex-wrap: wrap; }
+  .hero .meta div { border-left: 2px solid var(--accent-dim); padding-left: 12px; }
+  .hero .meta .k { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .hero .meta .v { font-size: 1rem; color: var(--ink); font-weight: 600; }
+
+  /* terminal card */
+  .term {
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+    box-shadow: var(--shadow); font-family: var(--mono); font-size: 12.5px;
+  }
+  .term .bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; border-bottom: 1px solid var(--line); color: var(--faint); }
+  .term .bar b { font-weight: 500; margin-left: 8px; letter-spacing: .04em; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+  .term .body { padding: 16px 16px 20px; line-height: 1.85; }
+  .term .body .c { color: var(--faint); }
+  .term .body .p { color: var(--accent); }
+  .term .body .g { color: var(--ink); }
+  .term .body .a { color: var(--accent-hi); }
+  .cursor { display: inline-block; width: 7px; height: 15px; background: var(--accent); vertical-align: -2px; animation: blink 1.1s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ---- SECTION frame ---- */
+  section { padding: 84px 0; }
+  .shead { max-width: 60ch; margin-bottom: 46px; }
+  .shead h2 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); letter-spacing: -.02em; margin: 0 0 12px; font-weight: 750; text-wrap: balance; }
+  .shead p { color: var(--muted); margin: 0; font-size: 1.02rem; }
+
+  /* ---- STATS bento ---- */
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 26px 24px; transition: transform .3s cubic-bezier(.16,1,.3,1), border-color .3s; }
+  .stat:hover { transform: translateY(-4px); border-color: var(--accent-dim); }
+  .stat.big { grid-column: span 3; }
+  .stat.med { grid-column: span 2; }
+  .stat.sm { grid-column: span 2; }
+  .stat .n { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 700; letter-spacing: -.02em; line-height: 1; color: var(--ink); }
+  .stat.big .n { font-size: clamp(2.8rem, 6vw, 4.4rem); }
+  .stat .n { font-size: 2.3rem; }
+  .stat .n em { color: var(--accent); font-style: normal; }
+  .stat .l { color: var(--muted); font-size: .93rem; margin-top: 10px; }
+  .stat .sub { color: var(--faint); font-size: .82rem; margin-top: 4px; font-family: var(--mono); }
+
+  /* shared bar (story confidence) */
+  .track { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .track > i { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent-dim), var(--accent)); transition: width 1.1s cubic-bezier(.16,1,.3,1); }
+  .in .track > i { width: var(--w); }
+
+  /* ---- SKILLS proof table ---- */
+  .tablewrap { overflow-x: auto; }
+  .proof { min-width: 660px; border-top: 1px solid var(--line); }
+  .prow { display: grid; grid-template-columns: 1.7fr .7fr .7fr 1.15fr .95fr; align-items: center; gap: 26px; padding: 17px 10px; border-bottom: 1px solid var(--line); transition: background .18s; }
+  .prow.head { padding-top: 4px; padding-bottom: 15px; }
+  .prow.head span { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .prow:not(.head):hover { background: var(--panel); }
+  .prow .sk { font-weight: 650; font-size: 1.04rem; }
+  .prow .sk small { display: block; color: var(--faint); font-weight: 400; font-family: var(--mono); font-size: 10.5px; letter-spacing: .03em; margin-top: 3px; }
+  .prow .metric { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); font-size: 1.02rem; }
+  .prow .metric b { color: var(--faint); font-weight: 400; font-size: .78em; margin-left: 4px; }
+  .prow .spark { height: 30px; opacity: 0; transition: opacity .8s ease .3s; }
+  .in .prow .spark, .prow.in .spark { opacity: 1; }
+  .prow .spark svg { display: block; width: 100%; height: 100%; }
+  .prow .last { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: right; }
+  .prow .last i { font-style: normal; display: block; color: var(--faint); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; margin-top: 3px; }
+  .pralign-r { text-align: right; }
+
+  /* ---- TIMELINE (git spine) ---- */
+  .timeline { position: relative; padding-left: 42px; }
+  .timeline::before { content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--accent), var(--accent-dim) 70%, transparent); }
+  .act { position: relative; padding-bottom: 58px; }
+  .act::before { content: ""; position: absolute; left: -42px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent); box-shadow: 0 0 0 4px var(--bg); }
+  .act .when { font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+  .act h3 { font-size: 1.5rem; letter-spacing: -.015em; margin: 6px 0 6px; font-weight: 700; }
+  .act h3 b { color: var(--accent); font-weight: 700; }
+  .act .arc { color: var(--muted); max-width: 62ch; margin: 0 0 20px; }
+  .milestones { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ms { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; transition: transform .25s, border-color .25s; }
+  .ms:hover { transform: translateY(-3px); border-color: var(--accent-dim); }
+  .ms .cat { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+  .ms .t { font-weight: 600; margin: 6px 0 4px; }
+  .ms .d { color: var(--muted); font-size: .9rem; }
+
+  /* full commit timeline */
+  .fulltl { position: relative; }
+  .fulltl::before { content: ""; position: absolute; left: -42px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent-dim); box-shadow: 0 0 0 4px var(--bg); }
+  .expander { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; text-align: left; cursor: pointer; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 17px 20px; color: var(--ink); font-family: var(--sans); font-size: 1rem; font-weight: 600; transition: border-color .2s, transform .14s; }
+  .expander:hover { border-color: var(--accent-dim); }
+  .expander:active { transform: scale(.99); }
+  .expander:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .expander .chev { color: var(--accent); font-family: var(--mono); transition: transform .25s; }
+  .expander[aria-expanded="true"] { border-color: var(--accent-dim); border-radius: 12px 12px 0 0; }
+  .expander[aria-expanded="true"] .chev { transform: rotate(90deg); }
+  .expander .cnt { margin-left: auto; margin-right: 4px; color: var(--faint); font-weight: 500; font-size: 12px; letter-spacing: .06em; font-family: var(--mono); }
+  .log { border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px; overflow: hidden; }
+  .logrow { display: grid; grid-template-columns: 92px 104px 1fr auto; gap: 18px; align-items: center; padding: 13px 20px; border-top: 1px solid var(--line); transition: background .15s; }
+  .logrow:first-child { border-top: 0; }
+  .logrow:hover { background: var(--panel); }
+  .logrow .date { font-family: var(--mono); font-size: 12px; color: var(--faint); letter-spacing: .04em; }
+  .logrow .lchip { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+  .logrow .lt { color: var(--ink); font-size: .93rem; }
+  .logrow .lpr { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+  /* ---- STAR stories (zig-zag) ---- */
+  .stories { display: grid; gap: 30px; }
+  .story { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); }
+  .story:nth-child(even) .body { order: 2; }
+  .story .side { background: var(--bg-2); padding: 34px; border-right: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; gap: 26px; }
+  .story:nth-child(even) .side { border-right: 0; border-left: 1px solid var(--line); }
+  .story .cat { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+  .story h3 { font-size: 1.5rem; letter-spacing: -.02em; margin: 12px 0 0; line-height: 1.15; }
+  .conf { margin-top: 22px; }
+  .conf .lab { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin-bottom: 7px; }
+  .conf .lab b { color: var(--accent); font-weight: 600; }
+  .conf .track { height: 6px; }
+  .evidence { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-family: var(--mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; }
+  .chip.pr { color: var(--accent); border-color: var(--accent-dim); }
+  .story .body { padding: 34px; display: grid; gap: 18px; align-content: start; }
+  .star { display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: baseline; }
+  .star .lab { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); padding-top: 2px; }
+  .star p { margin: 0; color: var(--ink); }
+  .star.res p { color: var(--muted); }
+  .star.res b { color: var(--accent-hi); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ---- LEDGER ---- */
+  .ledger { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 40px; }
+  .lgroup { border-top: 1px solid var(--line); padding: 20px 0; }
+  .lgroup h4 { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
+  .lgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+  .lgroup li { color: var(--muted); font-size: .92rem; padding-left: 14px; position: relative; }
+  .lgroup li::before { content: ""; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent-dim); }
+
+  /* ---- FOOTER ---- */
+  footer { border-top: 1px solid var(--line); padding: 56px 0 80px; }
+  footer .fg { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex-wrap: wrap; }
+  footer .brand { font-weight: 700; font-size: 1.15rem; letter-spacing: -.01em; }
+  footer .brand span { color: var(--accent); }
+  footer p { color: var(--muted); margin: 8px 0 0; max-width: 56ch; font-size: .95rem; }
+  footer .cmd { font-family: var(--mono); font-size: 12px; color: var(--faint); background: var(--bg-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+  footer .cmd b { color: var(--accent); }
+
+  @media (max-width: 860px) {
+    .hero-grid, .story, .story:nth-child(even) .body { grid-template-columns: 1fr; order: initial; }
+    .story .side, .story:nth-child(even) .side { border-right: 0; border-left: 0; border-bottom: 1px solid var(--line); }
+    .bento { grid-template-columns: repeat(2, 1fr); }
+    .stat.big, .stat.med, .stat.sm { grid-column: span 1; }
+    .stat.big { grid-column: span 2; }
+    .milestones, .ledger { grid-template-columns: 1fr; }
+    .logrow { grid-template-columns: 1fr auto; gap: 5px 14px; }
+    .logrow .lt { grid-column: 1 / -1; order: 3; }
+    .toggle { top: auto; bottom: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; scroll-behavior: auto; }
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+    .track > i { transition: none; }
+    .prow .spark { opacity: 1; transition: none; }
+  }
+</style>
+
+<div class="grain"></div>
+<div class="progress" id="progress"></div>
+<button class="toggle" id="toggle" aria-label="Toggle color theme">Light</button>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow" data-reveal>Recall · engineering retrospective</p>
+      <h1 data-reveal style="--i:1">Three years, one repo,<br><span>2,347 commits</span> of evidence.</h1>
+      <p class="lede" data-reveal style="--i:2">Everything Maya Ellison demonstrably shipped in <b>cobalt-web</b>, read straight from the history — not from memory. One page to walk into the next interview with clarity, the confidence of receipts, and proof behind every line.</p>
+      <div class="meta" data-reveal style="--i:3">
+        <div><div class="k">Engineer</div><div class="v">Maya Ellison</div></div>
+        <div><div class="k">Repository</div><div class="v">cobalt / cobalt-web</div></div>
+        <div><div class="k">Tenure</div><div class="v num">Aug 2023 → Jul 2026</div></div>
+      </div>
+    </div>
+    <div class="term" data-reveal style="--i:2">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><b>git log --author=prem --stat</b></div>
+      <div class="body">
+        <div><span class="c">$</span> <span class="g">recall ./cobalt-web --author "maya"</span></div>
+        <div><span class="c">scanning 2,347 commits across 3 years…</span></div>
+        <div><span class="p">→</span> <span class="g">418 PRs merged · 1,204 reviews · 273 issues</span></div>
+        <div><span class="p">→</span> <span class="g">classified into </span><span class="a">9 skill areas</span></div>
+        <div><span class="p">→</span> <span class="g">61 accomplishments · </span><span class="a">confidence ≥ 40</span></div>
+        <div><span class="c"># from "fix typo" to production architecture</span></div>
+        <div><span class="c">$</span> <span class="cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="stats">
+  <div class="wrap">
+    <div class="shead" data-reveal>
+      <h2>The paper trail, counted.</h2>
+      <p>Objective signal pulled straight from git — the numbers a memory can't hold after year one.</p>
+    </div>
+    <div class="bento">
+      <div class="stat big" data-reveal style="--i:0"><div class="n" data-count="2347"><em>0</em></div><div class="l">Commits authored</div><div class="sub">≈ 2.1 / working day, sustained 3 yrs</div></div>
+      <div class="stat med" data-reveal style="--i:1"><div class="n" data-count="418">0</div><div class="l">Pull requests merged</div></div>
+      <div class="stat sm" data-reveal style="--i:2"><div class="n" data-count="273">0</div><div class="l">Issues closed</div></div>
+      <div class="stat sm" data-reveal style="--i:0"><div class="n" data-count="1204">0</div><div class="l">Review comments left</div><div class="sub">mentoring signal</div></div>
+      <div class="stat med" data-reveal style="--i:1"><div class="n"><span data-count="214">0</span>k <span style="color:var(--faint);font-weight:500">/</span> <span style="color:var(--muted)" data-count="138">0</span>k</div><div class="l">Lines added / removed</div></div>
+      <div class="stat sm" data-reveal style="--i:2"><div class="n" data-count="39">0</div><div class="l">Releases shipped</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="shead" data-reveal>
+      <h2>Depth you can defend in the room.</h2>
+      <p>No self-rated bars. Each competency is backed by the merged PRs and commits behind it, and a three-year activity trace — so when they ask "how deep?", the answer is a number, not a feeling.</p>
+    </div>
+    <div class="tablewrap" data-reveal>
+      <div class="proof">
+        <div class="prow head">
+          <span>Competency</span>
+          <span class="pralign-r">Merged PRs</span>
+          <span class="pralign-r">Commits</span>
+          <span>Activity · Q3 ’23 → Q2 ’26</span>
+          <span class="pralign-r">Last touched</span>
+        </div>
+        <div class="prow" data-reveal><div class="sk">React<small>components · hooks · context</small></div><div class="metric pralign-r">141</div><div class="metric pralign-r">812</div><div class="spark" data-spark="2,3,4,5,6,7,7,8,8,9,8,9"></div><div class="last">3 days ago<i>active</i></div></div>
+        <div class="prow" data-reveal><div class="sk">TypeScript<small>generics · utility types · inference</small></div><div class="metric pralign-r">118</div><div class="metric pralign-r">640</div><div class="spark" data-spark="1,2,3,4,5,6,7,7,8,8,9,8"></div><div class="last">3 days ago<i>active</i></div></div>
+        <div class="prow" data-reveal><div class="sk">Performance<small>virtualization · bundle budgets</small></div><div class="metric pralign-r">34</div><div class="metric pralign-r">190</div><div class="spark" data-spark="0,1,1,3,6,9,7,4,3,2,3,2"></div><div class="last">Apr ’26<i>3 mo ago</i></div></div>
+        <div class="prow" data-reveal><div class="sk">Testing<small>Playwright · Jest · MSW</small></div><div class="metric pralign-r">47</div><div class="metric pralign-r">210</div><div class="spark" data-spark="0,0,2,3,5,8,9,6,4,3,4,3"></div><div class="last">May ’26<i>2 mo ago</i></div></div>
+        <div class="prow" data-reveal><div class="sk">Node / API<small>REST · pagination · caching</small></div><div class="metric pralign-r">52</div><div class="metric pralign-r">240</div><div class="spark" data-spark="3,4,4,5,5,6,5,6,5,6,5,6"></div><div class="last">Jun ’26<i>3 wk ago</i></div></div>
+        <div class="prow" data-reveal><div class="sk">Architecture<small>module boundaries · design tokens</small></div><div class="metric pralign-r">22</div><div class="metric pralign-r">130</div><div class="spark" data-spark="0,0,1,1,2,3,4,5,6,8,9,8"></div><div class="last">2 wk ago<i>active</i></div></div>
+        <div class="prow" data-reveal><div class="sk">Accessibility<small>ARIA · focus management</small></div><div class="metric pralign-r">29</div><div class="metric pralign-r">96</div><div class="spark" data-spark="1,2,2,3,3,4,4,3,4,3,4,3"></div><div class="last">Mar ’26<i>4 mo ago</i></div></div>
+        <div class="prow" data-reveal><div class="sk">CI / CD<small>pipelines · preview envs</small></div><div class="metric pralign-r">18</div><div class="metric pralign-r">88</div><div class="spark" data-spark="0,1,3,4,3,5,6,4,3,4,3,2"></div><div class="last">Feb ’26<i>5 mo ago</i></div></div>
+        <div class="prow" data-reveal><div class="sk">GraphQL<small>schema design · normalized cache</small></div><div class="metric pralign-r">16</div><div class="metric pralign-r">72</div><div class="spark" data-spark="2,4,6,7,5,4,3,2,2,1,1,0"></div><div class="last">Nov ’25<i>8 mo ago</i></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="journey">
+  <div class="wrap">
+    <div class="shead" data-reveal>
+      <h2>The arc your history already tells.</h2>
+      <p>Three phases the log makes obvious — learn the terrain, take ownership, multiply through others — with the full commit-by-commit record one click underneath, for when an interviewer wants the specifics.</p>
+    </div>
+    <div class="timeline">
+
+      <div class="act" data-reveal>
+        <div class="when num">Act I · Aug 2023 – Jun 2024</div>
+        <h3>Learning the <b>terrain</b></h3>
+        <p class="arc">First 300 commits are small and cautious — bug fixes, copy tweaks, a nervous first PR. By spring the pattern flips: whole features land, reviewers stop leaving change requests.</p>
+        <div class="milestones">
+          <div class="ms"><div class="cat">React</div><div class="t">Reusable component library</div><div class="d">Extracted 40+ shared primitives from copy-pasted UI across the app.</div></div>
+          <div class="ms"><div class="cat">Auth</div><div class="t">Login &amp; token-refresh flow</div><div class="d">First end-to-end feature owned solo: protected routes, silent refresh.</div></div>
+        </div>
+      </div>
+
+      <div class="act" data-reveal>
+        <div class="when num">Act II · Jul 2024 – Aug 2025</div>
+        <h3>Taking <b>ownership</b></h3>
+        <p class="arc">Commits get bigger and more surgical. Maya stops fixing symptoms and starts fixing systems — a performance program, a design system, and a test suite the team stops fearing.</p>
+        <div class="milestones">
+          <div class="ms"><div class="cat">Performance</div><div class="t">Dashboard virtualization</div><div class="d">Cut a 5,000-row table from 5.2s to 2.1s first paint.</div></div>
+          <div class="ms"><div class="cat">Architecture</div><div class="t">Design system "Loom"</div><div class="d">Tokenized, documented components adopted across 6 product modules.</div></div>
+          <div class="ms"><div class="cat">Testing</div><div class="t">Playwright migration</div><div class="d">Replaced flaky Cypress specs; brought CI failures from 18% to 3%.</div></div>
+          <div class="ms"><div class="cat">API</div><div class="t">Optimistic mutations</div><div class="d">Cursor pagination + optimistic updates across the data layer.</div></div>
+        </div>
+      </div>
+
+      <div class="act" data-reveal>
+        <div class="when num">Act III · Sep 2025 – Jul 2026</div>
+        <h3>Multiplying through <b>others</b></h3>
+        <p class="arc">The review-comment count overtakes the commit count. Maya's fingerprints move from files to decisions — leading a migration, defining boundaries, and unblocking a team through 1,200+ review threads.</p>
+        <div class="milestones">
+          <div class="ms"><div class="cat">Architecture</div><div class="t">Feature-flag platform</div><div class="d">Progressive-delivery layer decoupling release from deploy.</div></div>
+          <div class="ms"><div class="cat">Migration</div><div class="t">React 18 → 19 rollout</div><div class="d">Led a 90-PR incremental upgrade with zero customer incidents.</div></div>
+          <div class="ms"><div class="cat">Reliability</div><div class="t">Incident command</div><div class="d">Owned two Sev-2 responses; wrote the postmortems and the fixes.</div></div>
+          <div class="ms"><div class="cat">Mentoring</div><div class="t">1,204 review threads</div><div class="d">Reviewed more code than most engineers wrote — raised the bar.</div></div>
+        </div>
+      </div>
+
+      <div class="fulltl" data-reveal>
+        <button class="expander" id="tlBtn" aria-expanded="false" aria-controls="fullLog">
+          <span class="chev">›</span>
+          <span class="lbl">Open the full commit-by-commit timeline</span>
+          <span class="cnt">61 milestones · 2,347 commits</span>
+        </button>
+        <div class="log" id="fullLog" hidden>
+          <div class="logrow"><span class="date">2023 · Aug</span><span class="lchip">Onboarding</span><span class="lt">First merged PR — fixed pagination off-by-one on the accounts table</span><span class="lpr">#0037</span></div>
+          <div class="logrow"><span class="date">2023 · Oct</span><span class="lchip">React</span><span class="lt">Extracted the first shared primitives from copy-pasted UI</span><span class="lpr">#0192</span></div>
+          <div class="logrow"><span class="date">2024 · Jan</span><span class="lchip">Auth</span><span class="lt">Owned login + silent token-refresh flow end to end</span><span class="lpr">#0388</span></div>
+          <div class="logrow"><span class="date">2024 · Apr</span><span class="lchip">Accessibility</span><span class="lt">Keyboard navigation and focus traps across all modals</span><span class="lpr">#0541</span></div>
+          <div class="logrow"><span class="date">2024 · Jul</span><span class="lchip">Performance</span><span class="lt">Dashboard virtualization — 5.2s to 2.1s first paint</span><span class="lpr">#1284</span></div>
+          <div class="logrow"><span class="date">2024 · Sep</span><span class="lchip">Testing</span><span class="lt">Migrated the suite off flaky Cypress to Playwright</span><span class="lpr">#1502</span></div>
+          <div class="logrow"><span class="date">2024 · Dec</span><span class="lchip">Architecture</span><span class="lt">Shipped the "Loom" design system + migration codemod</span><span class="lpr">#0892</span></div>
+          <div class="logrow"><span class="date">2025 · Mar</span><span class="lchip">API</span><span class="lt">Cursor pagination + optimistic mutations in the data layer</span><span class="lpr">#1740</span></div>
+          <div class="logrow"><span class="date">2025 · Jun</span><span class="lchip">CI / CD</span><span class="lt">Per-PR preview environments and a bundle-budget gate</span><span class="lpr">#1888</span></div>
+          <div class="logrow"><span class="date">2025 · Sep</span><span class="lchip">Architecture</span><span class="lt">Feature-flag platform decoupling release from deploy</span><span class="lpr">#1961</span></div>
+          <div class="logrow"><span class="date">2025 · Nov</span><span class="lchip">Migration</span><span class="lt">Kicked off the incremental React 18 → 19 rollout</span><span class="lpr">#2033</span></div>
+          <div class="logrow"><span class="date">2026 · Feb</span><span class="lchip">Reliability</span><span class="lt">Incident command on Sev-2; wrote the postmortem and the fix</span><span class="lpr">#2210</span></div>
+          <div class="logrow"><span class="date">2026 · Apr</span><span class="lchip">Performance</span><span class="lt">Hydration pass — cut time-to-interactive another 22%</span><span class="lpr">#2298</span></div>
+          <div class="logrow"><span class="date">2026 · Jun</span><span class="lchip">Mentoring</span><span class="lt">Crossed 1,200 review threads; authored the review playbook</span><span class="lpr">#2341</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="stories">
+  <div class="wrap">
+    <div class="shead" data-reveal>
+      <h2>Interview-ready, evidence-backed.</h2>
+      <p>The flagship work as STAR stories — each with the diff, the PR, and a confidence score that keeps the typo fixes off the résumé.</p>
+    </div>
+    <div class="stories">
+
+      <article class="story" data-reveal>
+        <div class="side">
+          <div>
+            <div class="cat">Performance</div>
+            <h3>Made a 5,000-row dashboard feel instant</h3>
+          </div>
+          <div>
+            <div class="conf">
+              <div class="lab"><span>Confidence</span><b class="num">97</b></div>
+              <div class="track"><i style="--w:97%"></i></div>
+            </div>
+            <div class="evidence" style="margin-top:18px">
+              <span class="chip pr">PR #1284</span><span class="chip">14 commits</span><span class="chip">a3f9e1…</span><span class="chip">deploy v4.2</span>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="star"><div class="lab">Situation</div><p>The ledger dashboard locked up rendering 5,000+ rows; support tickets called it "frozen."</p></div>
+          <div class="star"><div class="lab">Task</div><p>Restore responsiveness without changing behavior or breaking the export path.</p></div>
+          <div class="star"><div class="lab">Action</div><p>Introduced row virtualization, memoized the expensive cells, code-split the charts, and lazy-loaded the export module.</p></div>
+          <div class="star res"><div class="lab">Result</div><p>First paint <b>5.2s → 2.1s</b>, <b>40%</b> fewer renders, Lighthouse <b>61 → 94</b>.</p></div>
+        </div>
+      </article>
+
+      <article class="story" data-reveal>
+        <div class="side">
+          <div>
+            <div class="cat">Architecture · React</div>
+            <h3>Built the design system six teams now build on</h3>
+          </div>
+          <div>
+            <div class="conf">
+              <div class="lab"><span>Confidence</span><b class="num">94</b></div>
+              <div class="track"><i style="--w:94%"></i></div>
+            </div>
+            <div class="evidence" style="margin-top:18px">
+              <span class="chip pr">PR #892</span><span class="chip">63 commits</span><span class="chip">RFC-014</span><span class="chip">6 modules</span>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="star"><div class="lab">Situation</div><p>Every squad reinvented buttons and modals; the UI drifted and a11y regressed weekly.</p></div>
+          <div class="star"><div class="lab">Task</div><p>Create one source of truth without stalling product delivery mid-flight.</p></div>
+          <div class="star"><div class="lab">Action</div><p>Shipped "Loom": tokenized primitives, headless hooks, docs, and a codemod to migrate existing screens.</p></div>
+          <div class="star res"><div class="lab">Result</div><p>Adopted by <b>6</b> modules, <b>−31%</b> UI code, a11y violations <b>down 78%</b>.</p></div>
+        </div>
+      </article>
+
+      <article class="story" data-reveal>
+        <div class="side">
+          <div>
+            <div class="cat">Migration · Reliability</div>
+            <h3>Led the React 19 upgrade with zero incidents</h3>
+          </div>
+          <div>
+            <div class="conf">
+              <div class="lab"><span>Confidence</span><b class="num">91</b></div>
+              <div class="track"><i style="--w:91%"></i></div>
+            </div>
+            <div class="evidence" style="margin-top:18px">
+              <span class="chip pr">PR #2033</span><span class="chip">90 PRs</span><span class="chip">feature-flagged</span>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="star"><div class="lab">Situation</div><p>The app was two majors behind; concurrent-mode bugs blocked new hires' features.</p></div>
+          <div class="star"><div class="lab">Task</div><p>Upgrade a live, high-traffic app without a maintenance window.</p></div>
+          <div class="star"><div class="lab">Action</div><p>Sequenced a 90-PR incremental rollout behind flags, wrote codemods, and gated each slice on real-user metrics.</p></div>
+          <div class="star res"><div class="lab">Result</div><p><b>0</b> customer incidents, <b>−22%</b> hydration time, unblocked <b>7</b> stalled features.</p></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="ledger">
+  <div class="wrap">
+    <div class="shead" data-reveal>
+      <h2>Nothing forgotten, all of it filed.</h2>
+      <p>The full inventory Recall recovered from three years of work — grouped by skill and phrased so each line drops straight into a résumé bullet or the answer to "tell me about a time you…".</p>
+    </div>
+    <div class="ledger" data-reveal>
+      <div class="lgroup"><h4>Performance</h4><ul><li>List virtualization</li><li>Route-level code splitting</li><li>Image &amp; font optimization</li><li>Memoized render paths</li></ul></div>
+      <div class="lgroup"><h4>React</h4><ul><li>Headless component hooks</li><li>Context-driven theming</li><li>Suspense data boundaries</li><li>Form state primitives</li></ul></div>
+      <div class="lgroup"><h4>TypeScript</h4><ul><li>Generic API client</li><li>Discriminated unions</li><li>Type-safe routing</li><li>Utility-type helpers</li></ul></div>
+      <div class="lgroup"><h4>Testing</h4><ul><li>Playwright e2e suite</li><li>Visual regression gates</li><li>MSW request mocking</li><li>Flake quarantine</li></ul></div>
+      <div class="lgroup"><h4>API &amp; Data</h4><ul><li>Cursor pagination</li><li>Optimistic mutations</li><li>Retry &amp; backoff layer</li><li>Normalized cache</li></ul></div>
+      <div class="lgroup"><h4>Architecture</h4><ul><li>Module boundaries</li><li>Feature-flag platform</li><li>Monorepo tooling</li><li>Design tokens</li></ul></div>
+      <div class="lgroup"><h4>Accessibility</h4><ul><li>Keyboard navigation</li><li>ARIA live regions</li><li>Focus management</li><li>Reduced-motion paths</li></ul></div>
+      <div class="lgroup"><h4>Delivery</h4><ul><li>Preview environments</li><li>Release automation</li><li>Bundle-budget CI</li><li>Incident runbooks</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap fg">
+    <div>
+      <div class="brand">Re<span>call</span></div>
+      <p>Reconstructed from 2,347 commits, 418 pull requests, and 1,204 review threads in cobalt-web — Aug 2023 to Jul 2026. Every claim links back to a diff.</p>
+    </div>
+    <div class="cmd">$ recall ./cobalt-web <b>--author "maya"</b> &gt; journey.html</div>
+  </div>
+</footer>
+
+<script>
+  // theme toggle — data-theme must override the media query both ways
+  var root = document.documentElement, btn = document.getElementById('toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function sync() { btn.textContent = current() === 'dark' ? 'Light' : 'Dark'; }
+  btn.addEventListener('click', function () {
+    root.setAttribute('data-theme', current() === 'dark' ? 'light' : 'dark');
+    sync();
+  });
+  sync();
+
+  // scroll progress
+  var prog = document.getElementById('progress');
+  addEventListener('scroll', function () {
+    var h = document.documentElement, max = h.scrollHeight - h.clientHeight;
+    prog.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+  }, { passive: true });
+
+  // reveal + count-up + bar fill
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function countUp(el) {
+    var target = +el.getAttribute('data-count'), start = performance.now(), dur = 1300;
+    function step(now) {
+      var p = Math.min((now - start) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * e).toLocaleString();
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      en.target.querySelectorAll('[data-count]').forEach(function (c) {
+        if (reduce) { c.textContent = (+c.getAttribute('data-count')).toLocaleString(); }
+        else countUp(c);
+      });
+      io.unobserve(en.target);
+    });
+  }, { threshold: 0.18 });
+  document.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
+
+  // activity sparklines — bars brighten toward the present (encodes recency)
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  document.querySelectorAll('[data-spark]').forEach(function (el) {
+    var vals = el.getAttribute('data-spark').split(',').map(Number);
+    var W = 100, H = 30, n = vals.length, gap = 2.4;
+    var bw = (W - gap * (n - 1)) / n, max = Math.max.apply(null, vals) || 1;
+    var svg = document.createElementNS(SVGNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('aria-hidden', 'true');
+    vals.forEach(function (v, i) {
+      var bh = Math.max(2, (v / max) * H);
+      var r = document.createElementNS(SVGNS, 'rect');
+      r.setAttribute('x', (i * (bw + gap)).toFixed(2));
+      r.setAttribute('y', (H - bh).toFixed(2));
+      r.setAttribute('width', bw.toFixed(2));
+      r.setAttribute('height', bh.toFixed(2));
+      r.setAttribute('fill', 'var(--accent)');
+      r.setAttribute('opacity', (0.32 + 0.68 * (i / (n - 1))).toFixed(2));
+      svg.appendChild(r);
+    });
+    el.appendChild(svg);
+  });
+
+  // full commit timeline
+  var tlBtn = document.getElementById('tlBtn'), fullLog = document.getElementById('fullLog');
+  tlBtn.addEventListener('click', function () {
+    var opening = fullLog.hasAttribute('hidden');
+    if (opening) fullLog.removeAttribute('hidden'); else fullLog.setAttribute('hidden', '');
+    tlBtn.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    tlBtn.querySelector('.lbl').textContent =
+      opening ? 'Hide the full timeline' : 'Open the full commit-by-commit timeline';
+  });
+</script>
