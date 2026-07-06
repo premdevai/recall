@@ -80,6 +80,28 @@ Read it and follow its header instructions. This is not a style suggestion — i
 - Filter low-confidence trivia (default threshold 40; keep everything if asked); sort by
   confidence within each category.
 
+### Charts — always render these (git alone provides them)
+
+Do not ship a numbers-and-text page. `template.html` includes chart components that make the
+report data-heavy even with no MCP connected. Compute the arrays from git and fill them:
+
+- **Commits per month** (`data-timebars` = counts oldest→newest, `data-labels` = short month
+  labels) and the **contribution heatmap** (`data-heat` = one integer per day oldest→newest,
+  `data-start` = ISO date of the first cell, snapped back to a Monday):
+  ```
+  git log --author=<id> --date=format:'%Y-%m' --pretty=%ad | sort | uniq -c   # monthly
+  git log --author=<id> --date=short --pretty=%ad | sort | uniq -c            # per-day
+  ```
+  Expand the per-day counts into a *dense* CSV — every day in range, zeros included — so the grid
+  is continuous. For long tenures, the heatmap may cover the most recent ~12 months; say so in the
+  card note.
+- **Where the commits went** (`data-hbars` = `"Area:count,Area:count,…"`): commits per skill area.
+- Skill-row sparklines: use evenly-bucketed counts (commits per quarter), never a single raw
+  total — one giant bucket collapses the rest into a flatline.
+
+The template's JS turns these attributes into SVG with hover tooltips; you only supply the numbers,
+and they must reconcile with the headline stats. Never fabricate counts.
+
 ### Dynamic MCP components
 
 `template.html` ends with an **MCP COMPONENT LIBRARY** — pre-styled blocks for Datadog / CoreDash

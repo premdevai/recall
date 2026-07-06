@@ -208,6 +208,28 @@
   .lgroup li::before { content: ""; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent-dim); }
 
   /* ---- FOOTER ---- */
+  .chart { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 24px 24px 16px; }
+  .chart + .chart { margin-top: 16px; }
+  .chart .chead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 20px; }
+  .chart .ctitle { font-weight: 650; font-size: 1.02rem; }
+  .chart .cnote { font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: .04em; }
+  .chart svg { display: block; width: 100%; overflow: visible; }
+  .chart svg text { font-family: var(--mono); fill: var(--faint); }
+  .chart rect.bar { fill: var(--accent); transition: fill .15s; }
+  .chart rect.bar:hover { fill: var(--accent-hi); }
+  .chart rect[data-cell]:hover { stroke: var(--accent-hi); stroke-width: 1.5; }
+  .grid2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; align-items: start; }
+  .hlegend { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-top: 14px; justify-content: flex-end; }
+  .hlegend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  .hbars { display: grid; gap: 11px; }
+  .hbar { display: grid; grid-template-columns: 200px 1fr 52px; align-items: center; gap: 14px; }
+  .hbar .hl { font-size: .93rem; font-weight: 600; }
+  .hbar .htrack { height: 20px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .hbar .hfill { display: block; height: 100%; width: 0; border-radius: 5px; background: linear-gradient(90deg, var(--accent-dim), var(--accent)); transition: width 1s cubic-bezier(.16,1,.3,1); }
+  .in .hbar .hfill { width: var(--w); }
+  .hbar .hv { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; color: var(--accent); font-weight: 600; }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } .hbar { grid-template-columns: 120px 1fr 44px; gap: 10px; } }
+
   footer { border-top: 1px solid var(--line); padding: 56px 0 80px; }
   footer .fg { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex-wrap: wrap; }
   footer .brand { font-weight: 700; font-size: 1.15rem; letter-spacing: -.01em; }
@@ -232,6 +254,7 @@
     [data-reveal] { opacity: 1; transform: none; transition: none; }
     .track > i { transition: none; }
     .prow .spark { opacity: 1; transition: none; }
+    .hbar .hfill { transition: none; }
   }
 </style>
 
@@ -283,11 +306,30 @@
   </div>
 </section>
 
+<section id="activity">
+  <div class="wrap">
+    <div class="shead" data-reveal><h2>Shipping cadence, in the open.</h2><p>Every bar and cell is a real commit from the log — the rhythm of the work across three years.</p></div>
+    <div class="chart" data-reveal>
+      <div class="chead"><span class="ctitle">Commits per month</span><span class="cnote">2,347 commits · 36 months</span></div>
+      <div data-timebars="25,39,28,30,22,36,58,49,61,51,55,54,28,69,66,67,37,37,54,61,76,72,82,67,84,87,73,111,96,106,82,82,90,96,109,106" data-labels="Aug'23,Sep'23,Oct'23,Nov'23,Dec'23,Jan'24,Feb'24,Mar'24,Apr'24,May'24,Jun'24,Jul'24,Aug'24,Sep'24,Oct'24,Nov'24,Dec'24,Jan'25,Feb'25,Mar'25,Apr'25,May'25,Jun'25,Jul'25,Aug'25,Sep'25,Oct'25,Nov'25,Dec'25,Jan'26,Feb'26,Mar'26,Apr'26,May'26,Jun'26,Jul'26" data-unit="commits"></div>
+    </div>
+    <div class="chart" data-reveal>
+      <div class="chead"><span class="ctitle">Contribution heatmap</span><span class="cnote">one cell per day · last 12 months</span></div>
+      <div data-heat="5,7,7,2,2,0,0,4,3,1,0,4,0,1,1,4,0,7,7,0,0,7,1,0,7,0,1,0,0,2,7,0,2,0,1,7,0,3,5,3,1,0,5,2,0,0,1,1,0,0,0,4,4,1,1,1,5,0,1,0,7,0,0,0,0,0,0,0,0,0,0,0,3,4,1,1,1,3,0,0,0,0,0,0,0,4,0,1,3,0,0,2,2,4,2,5,0,0,4,1,7,0,4,1,0,4,0,0,4,0,0,1,4,1,1,2,2,1,0,0,5,1,2,1,0,1,2,7,4,0,1,0,0,2,2,2,0,0,0,0,0,2,0,7,5,0,0,1,2,2,0,1,0,0,7,1,1,0,0,0,1,1,2,7,7,2,0,0,2,5,1,5,0,0,0,2,4,0,7,0,0,1,2,2,0,5,0,0,0,0,1,0,1,3,0,0,2,1,0,0,2,0,0,3,7,1,0,2,1,0,0,0,0,0,2,0,0,7,0,5,3,1,0,0,3,0,0,0,0,0,0,2,0,3,0,0,0,1,0,5,5,3,2,0,0,2,4,2,0,3,1,0,0,5,3,3,0,0,0,0,0,4,4,0,0,0,1,0,0,0,2,0,0,0,0,1,3,0,0,0,2,5,7,0,2,0,1,2,1,2,0,0,0,0,7,1,2,1,1,0,0,7,0,0,0,2,0,1,5,0,3,2,0,0,0,0,3,2,0,0,0,0,7,0,7,1,2,0,0,1,0,0,7,5,0,0,0,0,3,2,3,0,0,0,7,2,0,7,1,0,5,0,0,1,0,0,1,0,1,3,0,0,1,0" data-start="2025-07-07"></div>
+      <div class="hlegend">Less <i style="background:var(--line)"></i><i style="background:var(--accent);opacity:.35"></i><i style="background:var(--accent);opacity:.55"></i><i style="background:var(--accent);opacity:.78"></i><i style="background:var(--accent)"></i> More</div>
+    </div>
+  </div>
+</section>
+
 <section id="skills">
   <div class="wrap">
     <div class="shead" data-reveal>
       <h2>Depth you can defend in the room.</h2>
       <p>No self-rated bars. Each competency is backed by the merged PRs and commits behind it, and a three-year activity trace — so when they ask "how deep?", the answer is a number, not a feeling.</p>
+    </div>
+    <div class="chart" data-reveal style="margin-bottom:24px">
+      <div class="chead"><span class="ctitle">Where the commits went</span><span class="cnote">by area</span></div>
+      <div class="hbars" data-hbars="React:812,TypeScript:640,Node / API:240,Testing:210,Performance:190,Architecture:130,Accessibility:96,CI / CD:88,GraphQL:72"></div>
     </div>
     <div class="tablewrap" data-reveal>
       <div class="proof">
@@ -563,6 +605,52 @@
       svg.appendChild(r);
     });
     el.appendChild(svg);
+  });
+
+  // ── git-derived charts ──
+  function mk(t,a){ var e=document.createElementNS(SVGNS,t); for(var k in a) e.setAttribute(k,a[k]); return e; }
+  function titled(el,text){ var t=mk('title',{}); t.textContent=text; el.appendChild(t); return el; }
+  document.querySelectorAll('[data-timebars]').forEach(function(el){
+    var vals=el.getAttribute('data-timebars').split(',').map(Number);
+    var labels=(el.getAttribute('data-labels')||'').split(','), unit=el.getAttribute('data-unit')||'';
+    var W=680,H=190,padB=24,padT=6,n=vals.length,gap=n>40?1.5:3;
+    var bw=(W-gap*(n-1))/n, max=Math.max.apply(null,vals)||1, plot=H-padB-padT;
+    var svg=mk('svg',{viewBox:'0 0 '+W+' '+H,role:'img'});
+    svg.appendChild(mk('line',{x1:0,y1:H-padB,x2:W,y2:H-padB,stroke:'var(--line)','stroke-width':1}));
+    var step=Math.max(1,Math.ceil(n/6));
+    vals.forEach(function(v,i){
+      var bh=v>0?Math.max(3,(v/max)*plot):0, x=i*(bw+gap), y=H-padB-bh;
+      svg.appendChild(titled(mk('rect',{x:x.toFixed(1),y:y.toFixed(1),width:bw.toFixed(1),height:bh.toFixed(1),rx:Math.min(3,bw/2).toFixed(1),'class':'bar'}), (labels[i]||('#'+(i+1)))+' — '+v+' '+unit));
+      if(i===0||i===n-1||i%step===0){ var tx=mk('text',{x:(x+bw/2).toFixed(1),y:H-8,'text-anchor':'middle','font-size':'9'}); tx.textContent=labels[i]||''; svg.appendChild(tx); }
+    });
+    el.appendChild(svg);
+  });
+  document.querySelectorAll('[data-heat]').forEach(function(el){
+    var vals=el.getAttribute('data-heat').split(',').map(Number), start=el.getAttribute('data-start');
+    var cell=12,gap=3,st=cell+gap,weeks=Math.ceil(vals.length/7),W=weeks*st-gap,H=7*st-gap;
+    var max=Math.max.apply(null,vals)||1, op={1:.35,2:.55,3:.78,4:1};
+    var base=start?new Date(start+'T00:00:00'):null;
+    var svg=mk('svg',{viewBox:'0 0 '+W+' '+H,role:'img'}); svg.setAttribute('preserveAspectRatio','xMinYMin meet');
+    vals.forEach(function(v,i){
+      var wk=Math.floor(i/7),dy=i%7, q=v/max, L=v<=0?0:(q<.25?1:q<.5?2:q<.75?3:4);
+      var r=mk('rect',{x:wk*st,y:dy*st,width:cell,height:cell,rx:2,'data-cell':'',fill:L===0?'var(--line)':'var(--accent)',opacity:L===0?1:op[L]});
+      var lbl=(v===1?'1 commit':v+' commits');
+      if(base){ var d=new Date(base.getTime()+i*86400000); lbl=d.toISOString().slice(0,10)+' · '+lbl; }
+      svg.appendChild(titled(r,lbl));
+    });
+    el.appendChild(svg);
+  });
+  document.querySelectorAll('[data-hbars]').forEach(function(el){
+    var pairs=el.getAttribute('data-hbars').split(',').map(function(s){ var x=s.split(':'); return {k:x[0], v:+x[1]}; });
+    var max=Math.max.apply(null,pairs.map(function(p){return p.v;}))||1;
+    pairs.forEach(function(p){
+      var row=document.createElement('div'); row.className='hbar';
+      var hl=document.createElement('div'); hl.className='hl'; hl.textContent=p.k;
+      var tr=document.createElement('div'); tr.className='htrack';
+      var fi=document.createElement('span'); fi.className='hfill'; fi.style.setProperty('--w',(p.v/max*100).toFixed(1)+'%'); tr.appendChild(fi);
+      var hv=document.createElement('div'); hv.className='hv'; hv.textContent=p.v;
+      row.appendChild(hl); row.appendChild(tr); row.appendChild(hv); el.appendChild(row);
+    });
   });
 
   // full commit timeline
