@@ -2,6 +2,12 @@
   <img src="https://raw.githubusercontent.com/premdevai/recall/main/assets/recall-banner.png" alt="Recall — turn your git history into interview-ready proof of impact" width="100%">
 </p>
 
+<p align="center">
+  <b><a href="https://premdevai.github.io/recall/">Live site</a></b>
+  &nbsp;·&nbsp; <a href="https://www.npmjs.com/package/@premdevai/recall">npm</a>
+  &nbsp;·&nbsp; <a href="https://premdevai.github.io/recall/examples/journey.html">Sample output</a>
+</p>
+
 # Recall
 
 **Reconstruct everything you've demonstrably built — from your own git history and the tools
