@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/premdevai/recall/main/assets/recall-banner.png" alt="Recall — turn your git history into interview-ready proof of impact" width="100%">
+</p>
+
 # Recall
 
 **Reconstruct everything you've demonstrably built — from your own git history and the tools
