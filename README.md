@@ -47,10 +47,28 @@ writes this shape; a new **renderer** reads it. That's the whole extension surfa
 
 ## Install
 
-### Option A — Claude Code skill (recommended, zero dependencies)
+### Option A — Claude Code skill via npx (recommended, zero config)
 
-If you use Claude Code, Recall is a single skill file. It reuses your existing git and MCP
-connections, so there are no API keys to manage and nothing to build.
+Recall is a single skill file. It reuses your existing git and MCP connections, so there are no
+API keys to manage and nothing to build. One command installs it:
+
+```bash
+npx @premdevai/recall            # installs to ~/.claude/skills/recall
+npx @premdevai/recall --here     # or scope it to the current project
+```
+
+Then, in any repository, ask Claude Code:
+
+```
+/recall
+```
+
+Recall scopes the run, reads your history, pulls from whichever MCP sources you have connected,
+and renders the page or Markdown.
+
+### Option B — copy the skill by hand
+
+No Node? Drop [`skill/SKILL.md`](skill/SKILL.md) into `~/.claude/skills/recall/` yourself:
 
 ```bash
 mkdir -p ~/.claude/skills/recall
@@ -58,17 +76,7 @@ curl -fsSL https://raw.githubusercontent.com/premdevai/recall/main/skill/SKILL.m
   -o ~/.claude/skills/recall/SKILL.md
 ```
 
-Or just copy [`skill/SKILL.md`](skill/SKILL.md) into `~/.claude/skills/recall/` by hand. Then, in
-any repository:
-
-```
-/recall
-```
-
-Recall will scope the run, read your history, pull from whichever MCP sources you have connected,
-and render the page or Markdown.
-
-### Option B — Standalone CLI (git-only, any environment)
+### Option C — Standalone CLI (git-only, any environment)
 
 For CI or use outside Claude Code. Requires an [Anthropic API key](https://console.anthropic.com).
 

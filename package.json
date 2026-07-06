@@ -1,0 +1,38 @@
+{
+  "name": "@premdevai/recall",
+  "version": "0.1.0",
+  "description": "Reconstruct everything you've demonstrably built from git history and your connected tools into an interview-ready, evidence-backed HTML page or Markdown file. Installs as a Claude Code skill.",
+  "bin": {
+    "recall": "bin/install.js"
+  },
+  "files": [
+    "bin",
+    "skill",
+    "evidence.schema.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "git",
+    "career",
+    "resume",
+    "interview-prep",
+    "brag-doc",
+    "claude-code",
+    "mcp",
+    "developer-tools"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/premdevai/recall.git"
+  },
+  "homepage": "https://github.com/premdevai/recall#readme",
+  "bugs": {
+    "url": "https://github.com/premdevai/recall/issues"
+  },
+  "license": "MIT",
+  "author": "premdevai",
+  "engines": {
+    "node": ">=16"
+  }
+}
