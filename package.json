@@ -26,7 +26,7 @@
     "type": "git",
     "url": "git+https://github.com/premdevai/recall.git"
   },
-  "homepage": "https://premdevai.github.io/recall/",
+  "homepage": "https://recall-flax.vercel.app",
   "bugs": {
     "url": "https://github.com/premdevai/recall/issues"
   },

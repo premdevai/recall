@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 me.md
 me.html
+.vercel
