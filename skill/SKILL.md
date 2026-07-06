@@ -62,17 +62,37 @@ Also derive a **skills table**: per competency, the real merged-PR and commit co
 activity trace over the timeframe, and when it was last touched. Counts come from the data —
 never a self-assessed 0–100 score.
 
-## 4. Render
+## 4. Render — use the locked template, do not invent a design
 
-Match the structure and visual language of the reference outputs in this repo:
-`examples/journey.html` and `examples/journey.md` (or the live sample linked in the README).
-The two must be identical in detail — the same facts, one as a designed page, one as text.
+**HTML output MUST be built from `template.html`, which sits next to this file.**
+Read it and follow its header instructions. This is not a style suggestion — it is the design.
 
-- Filter low-confidence trivia (default threshold 40; keep everything if the user asks).
-- Sort by confidence within each category.
-- **HTML** — a single self-contained file: inline CSS and JS, no external requests, works
-  offline, theme-aware, responsive.
-- **Markdown** — portable and paste-ready; render sparklines as unicode blocks (`▁▂▃▄▅▆▇█`).
+- **Copy the entire `<style>` and `<script>` blocks from `template.html` VERBATIM.** Do not
+  write your own CSS. Do not change the palette, fonts, radii, or spacing.
+- **The look is amber (`#d29a4a`) on warm near-black/paper, with a monospace "terminal" voice.**
+  Purple, blue, indigo, violet, emerald, and teal accents are **FORBIDDEN** — if you find
+  yourself writing a hex like `#7b4dff`, `#6366f1`, or `#0ea5a4`, you have gone wrong; stop and
+  copy the template's tokens instead. Generic `system-ui`-only pages are also wrong.
+- Fill the placeholders (`{{...}}`) with real evidence. Duplicate a block (`.stat`, `.prow`,
+  `.story`, `.logrow`, `.signal`) once per data item; delete blocks you have no data for.
+- Keep it a single self-contained file: inline everything, no external requests, theme-aware,
+  responsive. Keep the reveal / count-up / sparkline script intact.
+- Filter low-confidence trivia (default threshold 40; keep everything if asked); sort by
+  confidence within each category.
+
+### Dynamic MCP components
+
+`template.html` ends with an **MCP COMPONENT LIBRARY** — pre-styled blocks for Datadog / CoreDash
+metric deltas, Sentry error rates, incidents (PagerDuty), CI/CD reliability, and Jira/Linear
+delivery. For each connected source with data, copy the matching component into the **Signals**
+section, one per metric/incident. Choose the `good`/`warn`/`crit` status class honestly by whether
+the change is an improvement. **Remove the Signals section entirely if no metric source is
+connected** — never fabricate a measurement or a source badge.
+
+### Markdown output
+
+Portable and paste-ready, identical in detail to the HTML. Render sparklines as unicode blocks
+(`▁▂▃▄▅▆▇█`). Match the structure of `examples/journey.md` in this repo.
 
 ## Rules
 

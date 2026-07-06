@@ -19,9 +19,9 @@ Then, in any repository, ask Claude Code to run /recall.`);
   process.exit(0);
 }
 
-const src = path.join(__dirname, "..", "skill", "SKILL.md");
-if (!fs.existsSync(src)) {
-  console.error("error: bundled skill file is missing (" + src + ")");
+const srcDir = path.join(__dirname, "..", "skill");
+if (!fs.existsSync(path.join(srcDir, "SKILL.md"))) {
+  console.error("error: bundled skill files are missing (" + srcDir + ")");
   process.exit(1);
 }
 
@@ -29,12 +29,18 @@ const base = args.includes("--here")
   ? path.join(process.cwd(), ".claude", "skills", "recall")
   : path.join(os.homedir(), ".claude", "skills", "recall");
 
-const dest = path.join(base, "SKILL.md");
 fs.mkdirSync(base, { recursive: true });
-fs.copyFileSync(src, dest);
+// Copy every file in skill/ (SKILL.md + template.html) so the locked design
+// travels with the instructions.
+const copied = fs.readdirSync(srcDir).filter(function (f) {
+  return fs.statSync(path.join(srcDir, f)).isFile();
+});
+copied.forEach(function (f) {
+  fs.copyFileSync(path.join(srcDir, f), path.join(base, f));
+});
 
 console.log("Recall skill installed:");
-console.log("  " + dest);
+console.log("  " + base + "  (" + copied.join(", ") + ")");
 console.log("");
 console.log("Next: open Claude Code in any repo and run  /recall");
 console.log("It reuses your existing git and MCP connections — no keys, no config.");
