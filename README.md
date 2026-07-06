@@ -6,7 +6,6 @@
   <b><a href="https://recall-flax.vercel.app">Live site</a></b>
   &nbsp;·&nbsp; <a href="https://www.npmjs.com/package/@premdevai/recall">npm</a>
   &nbsp;·&nbsp; <a href="https://recall-flax.vercel.app/examples/journey">Sample output</a>
-  &nbsp;·&nbsp; <a href="https://premdevai.github.io/recall/">mirror</a>
 </p>
 
 # Recall
