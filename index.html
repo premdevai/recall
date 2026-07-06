@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recall — turn your git history into interview-ready proof</title>
+<meta name="description" content="Reconstruct everything you've demonstrably built from git history and your connected tools into an interview-ready, evidence-backed HTML page or Markdown file.">
+<meta property="og:title" content="Recall — turn your git history into interview-ready proof of impact">
+<meta property="og:description" content="From commits, PRs, metrics and tickets to a polished, evidence-backed page. Automatic. Yours.">
+<meta property="og:image" content="https://raw.githubusercontent.com/premdevai/recall/main/assets/recall-banner.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --bg: #0e0d0b; --bg-2: #141210; --panel: #191612; --line: #2a2620;
+    --ink: #ece6d8; --muted: #9a9082; --faint: #5f594f;
+    --accent: #d29a4a; --accent-hi: #e8bd7a; --accent-dim: #7a5c2e;
+    --shadow: 0 30px 70px -34px rgba(0,0,0,.75);
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    --maxw: 1240px;
+  }
+  :root[data-theme="light"] {
+    --bg: #f3ece0; --bg-2: #efe7d8; --panel: #fbf6ec; --line: #ddd2bf;
+    --ink: #2a251d; --muted: #6f6656; --faint: #a89c86;
+    --accent: #b07a26; --accent-hi: #8f6119; --accent-dim: #d8c39a;
+    --shadow: 0 30px 70px -40px rgba(80,60,20,.3);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  .grain { position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: .04; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
+  a { color: inherit; text-decoration: none; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); margin: 0; }
+  .mono { font-family: var(--mono); }
+
+  /* topbar */
+  .topbar { position: sticky; top: 0; z-index: 90; backdrop-filter: blur(10px); background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--line); }
+  .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding-top: 15px; padding-bottom: 15px; gap: 18px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; font-size: 1.15rem; letter-spacing: -.01em; }
+  .logo { width: 30px; height: 30px; border: 1.5px solid var(--accent); border-radius: 8px; display: grid; place-items: center; color: var(--accent); }
+  .nav { display: flex; align-items: center; gap: 22px; }
+  .nav .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
+  .nav .chip svg { color: var(--accent); }
+  .badge { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent-dim); border-radius: 999px; padding: 6px 12px; }
+  .toggle { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; cursor: pointer; transition: color .2s, border-color .2s; }
+  .toggle:hover { color: var(--accent); border-color: var(--accent-dim); }
+  .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* hero */
+  .hero { padding: 72px 0 40px; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 54px; align-items: center; }
+  .hero h1 { font-size: clamp(2.6rem, 5.4vw, 4.6rem); line-height: .98; letter-spacing: -.035em; font-weight: 800; margin: 18px 0 24px; text-wrap: balance; }
+  .hero h1 .am { color: var(--accent); display: block; }
+  .hero .lede { font-size: 1.14rem; color: var(--muted); max-width: 52ch; margin: 0; }
+  .hero .lede b { color: var(--ink); font-weight: 600; }
+  .hero .lede .am { color: var(--accent); font-weight: 600; }
+  .feats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 30px; margin: 34px 0 30px; max-width: 560px; }
+  .feat { display: grid; grid-template-columns: 26px 1fr; gap: 12px; }
+  .feat svg { color: var(--accent); margin-top: 2px; }
+  .feat .t { font-weight: 650; font-size: .98rem; }
+  .feat .d { color: var(--muted); font-size: .88rem; margin-top: 2px; }
+  .cmd { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 13.5px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 15px 16px; max-width: 560px; }
+  .cmd .p { color: var(--faint); }
+  .cmd .g { color: var(--ink); }
+  .cmd .am { color: var(--accent); }
+  .cmd .cp { margin-left: auto; font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 7px; padding: 6px 10px; cursor: pointer; transition: color .2s, border-color .2s; }
+  .cmd .cp:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+  /* browser preview card */
+  .window { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+  .window .bar { display: flex; align-items: center; gap: 8px; padding: 13px 16px; border-bottom: 1px solid var(--line); }
+  .window .bar .d { width: 11px; height: 11px; border-radius: 50%; }
+  .window .bar .d1 { background: #e0685f; } .window .bar .d2 { background: #e6b04a; } .window .bar .d3 { background: #63c363; }
+  .window .bar .fn { margin-left: 10px; font-family: var(--mono); font-size: 12px; color: var(--faint); }
+  .window .content { padding: 26px 26px 28px; }
+  .window .brand { font-size: 1.05rem; }
+  .window h3 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); letter-spacing: -.025em; line-height: 1.02; margin: 14px 0 14px; font-weight: 750; }
+  .window h3 .am { color: var(--accent); }
+  .term { background: var(--bg-2); border: 1px solid var(--line); border-radius: 11px; font-family: var(--mono); font-size: 11.5px; line-height: 1.85; overflow: hidden; }
+  .term .tbar { display: flex; align-items: center; gap: 6px; padding: 9px 12px; border-bottom: 1px solid var(--line); color: var(--faint); }
+  .term .tbar .d { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .term .tbar b { font-weight: 500; margin-left: 6px; }
+  .term .tbody { padding: 12px 13px; }
+  .term .c { color: var(--faint); } .term .am { color: var(--accent); } .term .g { color: var(--ink); } .term .hi { color: var(--accent-hi); }
+  .window .facts { display: flex; gap: 26px; margin-top: 20px; flex-wrap: wrap; }
+  .window .facts .k { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .window .facts .v { font-weight: 600; font-size: .92rem; margin-top: 3px; }
+
+  /* tools strip */
+  .tools { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 26px 0; margin-top: 42px; }
+  .tools .wrap { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+  .tools .lab { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
+  .tools .names { display: flex; gap: 26px; flex-wrap: wrap; color: var(--muted); font-weight: 600; font-size: .95rem; }
+  .tools .names span { position: relative; }
+
+  /* sections */
+  section { padding: 84px 0; }
+  .shead { max-width: 62ch; margin-bottom: 44px; }
+  .shead h2 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); letter-spacing: -.02em; margin: 12px 0 12px; font-weight: 750; text-wrap: balance; }
+  .shead p { color: var(--muted); margin: 0; font-size: 1.02rem; }
+
+  /* pipeline */
+  .pipe { font-family: var(--mono); font-size: 13px; color: var(--muted); background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 24px 26px; overflow-x: auto; line-height: 1.9; }
+  .pipe .am { color: var(--accent); } .pipe .g { color: var(--ink); }
+
+  /* install cards */
+  .install { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 18px; }
+  .icard { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 24px; transition: border-color .25s, transform .25s; }
+  .icard:hover { border-color: var(--accent-dim); transform: translateY(-3px); }
+  .icard .tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  .icard h4 { margin: 8px 0 4px; font-size: 1.1rem; letter-spacing: -.01em; }
+  .icard p { color: var(--muted); font-size: .9rem; margin: 0 0 16px; }
+  .icard pre { margin: 0; font-family: var(--mono); font-size: 12.5px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: 13px 14px; overflow-x: auto; color: var(--ink); }
+  .icard pre .c { color: var(--faint); }
+
+  /* value row */
+  .vals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .val { border-top: 2px solid var(--accent-dim); padding-top: 18px; }
+  .val h4 { margin: 0 0 8px; font-size: 1.05rem; letter-spacing: -.01em; }
+  .val p { color: var(--muted); margin: 0; font-size: .95rem; }
+
+  /* cta */
+  .cta { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 52px; text-align: center; box-shadow: var(--shadow); }
+  .cta h2 { font-size: clamp(1.8rem, 3.6vw, 2.6rem); letter-spacing: -.025em; margin: 0 0 12px; font-weight: 780; text-wrap: balance; }
+  .cta p { color: var(--muted); margin: 0 auto 28px; max-width: 52ch; }
+  .btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 9px; font-weight: 600; font-size: .96rem; padding: 13px 22px; border-radius: 12px; border: 1px solid var(--line); transition: transform .14s, border-color .2s, background .2s; }
+  .btn:active { transform: scale(.98); }
+  .btn.primary { background: var(--accent); color: #17130c; border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-hi); }
+  .btn:hover { border-color: var(--accent-dim); }
+
+  footer { border-top: 1px solid var(--line); padding: 40px 0 64px; margin-top: 30px; }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; color: var(--faint); font-size: .9rem; }
+  footer .mono { color: var(--muted); }
+
+  [data-reveal] { opacity: 0; transform: translateY(20px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+  [data-reveal].in { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .install { grid-template-columns: 1fr; }
+    .vals { grid-template-columns: 1fr; gap: 26px; }
+    .nav .chip { display: none; }
+    .nav .badge { display: none; }
+    .cta { padding: 36px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; scroll-behavior: auto; } [data-reveal] { opacity: 1; transform: none; transition: none; } }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="logo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg></span>recall</div>
+    <nav class="nav">
+      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg>CLI &amp; Skill</span>
+      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4M15 3v4M4 8h16v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/></svg>MCP Ready</span>
+      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Private by design</span>
+      <a class="badge" href="https://github.com/premdevai/recall/blob/main/LICENSE">MIT License</a>
+      <button class="toggle" id="toggle" aria-label="Toggle theme">Light</button>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Engineering retrospective · Evidence backed</p>
+      <h1>Turn your git history into interview-ready <span class="am">proof of impact.</span></h1>
+      <p class="lede">Reconstruct everything you've demonstrably <b>built</b> — from commits and PRs to metrics and tickets — into a polished HTML page or Markdown file. Automatic. Evidence-backed. <span class="am">Yours.</span></p>
+      <div class="feats">
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6M18 9a3 3 0 0 0 0-6 3 3 0 0 0 0 6zm0 0c0 6-12 3-12 9"/></svg><div><div class="t">Git-first</div><div class="d">Diffs, commits, PRs, authorship</div></div></div>
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="4" y2="12"/><line x1="10" y1="20" x2="10" y2="7"/><line x1="16" y1="20" x2="16" y2="10"/><line x1="22" y1="20" x2="22" y2="4"/></svg><div><div class="t">Real impact</div><div class="d">Metrics, incidents, deploys</div></div></div>
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9 16 14 18 21 12 17 6 21 8 14 2 9 9 9"/></svg><div><div class="t">Interview-ready</div><div class="d">STAR stories, skills, confidence</div></div></div>
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h6M9 17h6"/></svg><div><div class="t">One dataset</div><div class="d">HTML page or Markdown</div></div></div>
+      </div>
+      <div class="cmd">
+        <span><span class="p">$</span> <span class="g">npx</span> <span class="am">@premdevai/recall</span></span>
+        <button class="cp" id="copyNpx" data-cmd="npx @premdevai/recall">Copy</button>
+      </div>
+    </div>
+
+    <div class="window" data-reveal>
+      <div class="bar"><span class="d d1"></span><span class="d d2"></span><span class="d d3"></span><span class="fn">journey.html — self-contained</span></div>
+      <div class="content">
+        <div class="brand"><span class="logo" style="width:26px;height:26px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg></span>recall</div>
+        <p class="eyebrow" style="margin-top:12px">Engineering retrospective</p>
+        <h3>Three years, one repo,<br><span class="am">2,347 commits</span> of evidence.</h3>
+        <div class="term">
+          <div class="tbar"><span class="d"></span><span class="d"></span><span class="d"></span><b>git log --author=you --stat</b></div>
+          <div class="tbody">
+            <div><span class="c">$</span> <span class="g">recall ./cobalt-web --author "maya"</span></div>
+            <div><span class="c">scanning 2,347 commits across 3 years…</span></div>
+            <div><span class="am">→</span> <span class="g">418 PRs merged · 1,204 reviews · 273 issues</span></div>
+            <div><span class="am">→</span> <span class="g">classified into </span><span class="hi">9 skill areas</span></div>
+            <div><span class="am">→</span> <span class="g">61 accomplishments · </span><span class="hi">confidence ≥ 40</span></div>
+            <div><span class="c"># from "fix typo" to production architecture</span></div>
+          </div>
+        </div>
+        <div class="facts">
+          <div><div class="k">Engineer</div><div class="v">Maya Ellison</div></div>
+          <div><div class="k">Repository</div><div class="v">cobalt / cobalt-web</div></div>
+          <div><div class="k">Tenure</div><div class="v mono" style="font-weight:600">Aug 2023 → Jul 2026</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="tools">
+  <div class="wrap">
+    <span class="lab">Works with the tools you already use</span>
+    <div class="names"><span>GitHub</span><span>GitLab</span><span>Bitbucket</span><span>Jira</span><span>Linear</span><span>Datadog</span><span>CI/CD</span></div>
+  </div>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="shead" data-reveal>
+      <p class="eyebrow">How it works</p>
+      <h2>One extraction. One dataset. Every format.</h2>
+      <p>Recall reads your history into a single evidence model, then renders it. Every source is just an adapter that maps onto that model — add one without touching the renderers.</p>
+    </div>
+    <div class="pipe" data-reveal>  sources ────────────►  <span class="am">evidence.json</span>  ────────────►  renders
+  <span class="g">git</span> (always)                 │                        ├── journey.html   <span style="color:var(--faint)">(self-contained page)</span>
+  GitHub / GitLab / Bitbucket  │   one schema:          └── journey.md     <span style="color:var(--faint)">(paste-ready text)</span>
+  Jira / Linear                │   accomplishments +
+  Datadog / observability      │   evidence[] +
+  CI / CD                      │   metrics{} + skills</div>
+  </div>
+</section>
+
+<section id="install" style="padding-top:0">
+  <div class="wrap">
+    <div class="shead" data-reveal>
+      <p class="eyebrow">Install</p>
+      <h2>Two commands, zero config.</h2>
+      <p>No API keys, nothing to build. Recall runs as a Claude Code skill and reuses the git and MCP connections you already have.</p>
+    </div>
+    <div class="install">
+      <div class="icard" data-reveal>
+        <div class="tag">Recommended</div>
+        <h4>npx</h4>
+        <p>Installs the skill in one command, then ask Claude <span class="mono">/recall</span>.</p>
+        <pre><span class="c"># installs to ~/.claude/skills</span>
+npx @premdevai/recall
+
+<span class="c"># then, in any repo</span>
+/recall</pre>
+      </div>
+      <div class="icard" data-reveal>
+        <div class="tag">No Node</div>
+        <h4>Copy the skill</h4>
+        <p>Drop the single skill file into your Claude Code skills directory.</p>
+        <pre>curl -fsSL \
+ .../skill/SKILL.md \
+ -o ~/.claude/skills/\
+recall/SKILL.md</pre>
+      </div>
+      <div class="icard" data-reveal>
+        <div class="tag">CI · git-only</div>
+        <h4>Standalone CLI</h4>
+        <p>For pipelines or use outside Claude Code. Outputs Markdown.</p>
+        <pre>pip install anthropic
+python recall.py . \
+  --author "you@ex.com"</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="why" style="padding-top:0">
+  <div class="wrap">
+    <div class="shead" data-reveal>
+      <p class="eyebrow">Why it holds up</p>
+      <h2>Proof, not a self-rating.</h2>
+    </div>
+    <div class="vals">
+      <div class="val" data-reveal><h4>Evidence or it didn't happen</h4><p>Every claim links back to a commit, PR, ticket, or metric. Skill depth is real merged-PR and commit counts — never a made-up 0–100 score.</p></div>
+      <div class="val" data-reveal><h4>Confidence, scored</h4><p>Each contribution is ranked on how résumé-worthy it is. A formatting change lands near 2; a shipped feature with measured impact near 95. The trivia stays off the page.</p></div>
+      <div class="val" data-reveal><h4>Private by design</h4><p>Runs entirely locally. Reads only what's on your machine or in the tools you've connected, and sends nothing anywhere except the model call you initiate. No servers, no telemetry.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="get" style="padding-top:0">
+  <div class="wrap">
+    <div class="cta" data-reveal>
+      <h2>Walk in with the receipts.</h2>
+      <p>Clarity, confidence, and proof behind every line — reconstructed from the work you've already done.</p>
+      <div class="btns">
+        <a class="btn primary" href="https://www.npmjs.com/package/@premdevai/recall">Install from npm</a>
+        <a class="btn" href="https://github.com/premdevai/recall">View on GitHub</a>
+        <a class="btn" href="./examples/journey.html">See a live sample</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand" style="font-size:1rem"><span class="logo" style="width:26px;height:26px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg></span>recall</div>
+    <div>MIT licensed · <a class="mono" href="https://github.com/premdevai/recall">github.com/premdevai/recall</a></div>
+  </div>
+</footer>
+
+<script>
+  var root = document.documentElement, btn = document.getElementById('toggle');
+  function cur(){ return root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light'); }
+  function sync(){ btn.textContent = cur()==='dark' ? 'Light':'Dark'; }
+  btn.addEventListener('click', function(){ root.setAttribute('data-theme', cur()==='dark'?'light':'dark'); sync(); });
+  sync();
+
+  var cp = document.getElementById('copyNpx');
+  cp.addEventListener('click', function(){
+    navigator.clipboard && navigator.clipboard.writeText(cp.getAttribute('data-cmd'));
+    var t = cp.textContent; cp.textContent = 'Copied'; setTimeout(function(){ cp.textContent = t; }, 1400);
+  });
+
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .15 });
+  document.querySelectorAll('[data-reveal]').forEach(function(el){ io.observe(el); });
+</script>
+</body>
+</html>
