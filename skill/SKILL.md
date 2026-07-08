@@ -1,6 +1,6 @@
 ---
 name: recall
-version: 0.7.0
+version: 0.8.0
 description: Reconstruct an engineer's demonstrable work from git history — and any connected MCP sources (GitHub/GitLab/Bitbucket PRs, Jira/Linear tickets, Datadog/CI metrics) — into a categorized, evidence-backed, interview-ready record, rendered as a self-contained HTML page or a Markdown file. Also powers the job-switch pipeline end to end — role-fit analysis (/recall roles), tailoring evidence to a job posting (/recall apply), the application funnel (/recall status), mock-interview rehearsal (/recall interview), comp-conversation briefs (/recall negotiate), résumé bullets (/recall bullets), STAR rehearsal (/recall star), and PDF / JSON Resume / LinkedIn exports. Use when the user asks to "summarize what I've built", "generate my brag doc / résumé bullets / interview prep", "what roles suit me", "tailor my resume to this job", "track my applications", "recall my work in this repo", "my career timeline", prepares for a review or promotion packet, or invokes /recall. /recall career merges evidence across repos and employers from the local store; /recall add records non-git work (talks, mentoring, on-call) as marked self-reported evidence.
 ---
 
@@ -29,6 +29,7 @@ load it first, then branch:
 | `/recall status` | Application funnel from the tracker — §7 |
 | `/recall interview <company>` | Mock-interview rehearsal against the stored kit — §7 |
 | `/recall negotiate` | Scope-and-impact brief for comp conversations — §7 |
+| `/recall since-last` | What shipped since the last packet — §8 |
 
 ## 1. Scope the run — never ask what you can infer
 
@@ -197,6 +198,10 @@ Make this stronger:
   · No PR/review data — connect GitHub MCP to add collaboration evidence
 ```
 
+Milestone nudge: if the digest shows commits in the current quarter but no accomplishment
+carries metric evidence dated this quarter, one line — "this quarter has no measured
+result yet" — belongs in the gap report.
+
 ## 5. Job-switch modes
 
 Both modes read `~/.recall/career.json` when it exists AND includes the current repo's
@@ -326,6 +331,34 @@ Format: scope (what they own), impact (each line = one measured result **with it
 ref inline** — a number without a ref does not go in the brief), and leverage
 (enabled rollup: reviews, unblocking). No scripts to run — but the no-unsourced-numbers
 rule is absolute here; this document gets read by the person deciding their pay.
+
+## 8. Always current
+
+### `/recall since-last` — the delta since the last packet
+
+Every full render stamps `.recall/snapshot.json`. To answer "what have I shipped since my
+last review":
+
+1. Refresh the evidence first: `node <skill-dir>/refresh.js --repo <path>`. On `unchanged`,
+   skip straight to step 3 — judge nothing. On `changed N`, judge only the digest
+   candidates newer than the existing evidence and merge them in (§3 incremental rules).
+2. File it: `node <skill-dir>/merge.js --add --repo <path>`.
+3. Render the delta: `node <skill-dir>/render.js --since-last` → `since-last.md` — only
+   the accomplishments new since the snapshot, with reconciled totals and a nudge when the
+   new work has no measured result. It never advances the snapshot; only a full render does.
+   If it exits 2 with "no snapshot", run a full report first.
+
+### Scheduled refresh — keep the evidence current without the model
+
+`refresh.js` is pure script: it re-gathers, appends to `.recall/refresh.log`, and prints
+`unchanged` / `changed N` / `first-run N`. When the user wants this automatic, offer both:
+
+- **Plain cron** (zero tokens ever): `0 9 * * 1  cd /path/to/repo && node ~/.claude/skills/recall/refresh.js`
+- **Claude Code scheduled agent** (weekly `/recall since-last`): set it up via the
+  `schedule` skill; the run exits early on `unchanged`, so idle weeks cost ~nothing.
+
+Never poll sources on a schedule yourself — refresh is pull-only and local; MCP re-queries
+happen only inside a real report run.
 
 ## Rules
 

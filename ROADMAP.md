@@ -73,15 +73,20 @@ From "I should switch" to "offer" without leaving the terminal.
 - Deferred (again): the batched-MCP call-count test (PLAN B1) still needs a mock MCP
   harness — v0.8
 
-## v0.8 — Always current
+## v0.8 — Always current *(shipped)*
 
 A brag doc is only useful if it exists *before* you need it.
 
-- [ ] Scheduled refresh — weekly incremental run keeps evidence current (Claude Code
-      scheduled agents / cron)
-- [ ] Review-season mode: `/recall since-last` — diff against the previous packet;
-      "what have I shipped since my last review"
-- [ ] Milestone nudges in the gap report: "this quarter has no measured result yet"
+- [x] Scheduled refresh — weekly incremental run keeps evidence current (Claude Code
+      scheduled agents / cron): `refresh.js` re-gathers tokenlessly, logs to
+      `.recall/refresh.log`, prints `unchanged`/`changed N` so idle weeks cost nothing
+- [x] Review-season mode: `/recall since-last` — diff against the previous packet;
+      "what have I shipped since my last review" (full renders stamp
+      `.recall/snapshot.json`; the delta renderer never advances it)
+- [x] Milestone nudges in the gap report: "this quarter has no measured result yet"
+      (mechanical in since-last; a gap-report rule for full runs)
+- Deferred (again): the batched-MCP call-count test (PLAN B1) still needs a mock MCP
+  harness — v1.0 alongside the adapter conformance kit
 
 ## v1.0 — Ecosystem
 

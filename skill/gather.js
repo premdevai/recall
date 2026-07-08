@@ -28,6 +28,16 @@ function git(args) {
   });
 }
 
+// --repo must BE the repo — git happily walks up to a parent repo, and a cron
+// job with a wrong path would silently digest the wrong project
+let toplevel = "";
+try { toplevel = git(["rev-parse", "--show-toplevel"]).trim(); }
+catch { console.error("recall gather: not a git repository: " + REPO); process.exit(2); }
+if (fs.realpathSync(toplevel) !== fs.realpathSync(REPO)) {
+  console.error(`recall gather: ${REPO} is not a repo root (found ${toplevel}) — pass the repository root as --repo`);
+  process.exit(2);
+}
+
 // ---------- identity & aliases ----------
 // %aN/%aE apply .mailmap automatically. Cluster additional aliases by
 // normalized name so "Maya R <maya@work>" and "maya <maya@gmail>" merge.
