@@ -15,7 +15,7 @@ execFileSync("bash", [path.join(__dirname, "fixture-repo.sh"), FIX], { stdio: "p
 execFileSync("node", [path.join(ROOT, "skill", "gather.js"), "--repo", FIX], { stdio: "pipe" });
 
 const evidence = {
-  schema_version: 1,
+  schema_version: 2,
   subject: { engineer: "Maya R", repo: "fixture", tenure: { from: "2024-01-02", to: "2024-05-01" }, sources: ["git", "jira"] },
   stats: { commits: 108, prsMerged: 14 },
   skills: [{ name: "API design", subtitle: "rest · pagination", prs: 9, commits: 40, lastTouched: "2024-05-01", activity: { unit: "quarter", values: [4, 12, 24] } }],
@@ -78,9 +78,11 @@ test("R4: markdown mirror carries the same evidence", () => {
   assert.ok(/[▁▂▃▄▅▆▇█]{3}/.test(md), "unicode sparkline expected");
 });
 
-test("R5: schema_version newer than renderer is refused", () => {
-  fs.writeFileSync(evPath, JSON.stringify({ ...evidence, schema_version: 2 }));
-  assert.throws(() => render(), (e) => e.status === 2 && /schema_version 2/.test(e.stderr));
+test("R5: schema_version newer than renderer is refused; v1 still accepted", () => {
+  fs.writeFileSync(evPath, JSON.stringify({ ...evidence, schema_version: 3 }));
+  assert.throws(() => render(), (e) => e.status === 2 && /schema_version 3/.test(e.stderr));
+  fs.writeFileSync(evPath, JSON.stringify({ ...evidence, schema_version: 1 }));
+  render(); // v1 files predate self-reported and must keep rendering
   fs.writeFileSync(evPath, JSON.stringify(evidence));
 });
 
@@ -90,6 +92,24 @@ test("R6: a claim without evidence is refused", () => {
   fs.writeFileSync(evPath, JSON.stringify(bad));
   assert.throws(() => render(), (e) => e.status === 2 && /no evidence/.test(e.stderr));
   fs.writeFileSync(evPath, JSON.stringify(evidence));
+});
+
+test("R8: self-reported is marked everywhere, even when source is omitted", () => {
+  const withSelf = JSON.parse(JSON.stringify(evidence));
+  withSelf.accomplishments.push({
+    // no source field — only type:self evidence; normalization must mark it
+    id: "sr1", category: "Communication", title: "Mentored two juniors", phase: "act-1",
+    date: "2024-03-01", resumeBullet: "Mentored two juniors to promotion.",
+    confidence: 60, evidence: [{ type: "self", ref: "told to recall 2024-03-01" }],
+  });
+  fs.writeFileSync(evPath, JSON.stringify(withSelf));
+  render();
+  const h = fs.readFileSync(outHtml, "utf8");
+  const m = fs.readFileSync(outMd, "utf8");
+  assert.ok(h.includes("Mentored two juniors (self-reported)"), "HTML log/milestones must mark self-reported");
+  assert.match(m, /Mentored two juniors to promotion\. _\(self-reported\)_/, "résumé bullets must mark self-reported");
+  assert.ok(h.includes("Self-reported items are marked"), "footer provenance note expected");
+  fs.writeFileSync(evPath, JSON.stringify(evidence)); render();
 });
 
 test("R7: renders without a digest (git-only extras removed, still valid)", () => {

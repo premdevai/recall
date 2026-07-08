@@ -88,8 +88,12 @@ and renders the page or Markdown.
 | `/recall apply <job posting>` | Résumé bullets reordered for that posting, cover-letter paragraphs, likely interview questions each paired with your STAR story, and an honest fit summary |
 | `/recall bullets` | Just the résumé bullets, paste-ready |
 | `/recall star <topic>` | One STAR story in rehearsal format |
+| `/recall career` | The timeline across every repo and employer — each report files itself into a local career store (`~/.recall/`, plain JSON, chmod 600), merged with cross-repo dedupe. `--exclude-employer` / `--anonymize` for sensitive reports |
+| `/recall add <what you did>` | Non-git work — talks, mentoring, on-call — recorded as marked `self-reported` evidence, never counted as verified |
 
 Every claim in every mode cites a commit, PR, or ticket — tailored, never inflated.
+Reviews and approvals you *gave* roll up separately as "enabled" impact, so senior-IC
+leverage is visible without inflating authored counts.
 
 ### Health check
 

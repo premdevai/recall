@@ -37,31 +37,41 @@ architecture early: `gather.js` (git → compact digest, no raw-log parsing) and
 - [x] `npm publish` via GitHub Action on tag — releases stop depending on a laptop
 - [x] Self-check suite: 15 tests over a deterministic fixture repo + leak gate, in CI
 
-## v0.6 — The full career, not one repo
+## v0.6 — The full career, not one repo *(shipped)*
 
 The unit of a job search is a career.
 
-- [ ] Career store: `~/.recall/` merges evidence across repos and employers, survives clones
-- [ ] Non-git evidence: talks, mentoring, docs, on-call — added conversationally, marked
+- [x] Career store: `~/.recall/` merges evidence across repos and employers, survives clones
+      (`merge.js` — root-commit-sha identity, cross-repo dedupe, `--exclude-employer`,
+      `--anonymize`, chmod 600)
+- [x] Non-git evidence: talks, mentoring, docs, on-call — added conversationally, marked
       `self-reported` (never silently mixed with verified evidence)
-- [ ] Career timeline render — the narrative across companies, not just one repo's charts
-- [ ] More adapters: GitLab reviews, Sentry, PagerDuty, GitHub Actions/CircleCI
-- [ ] Team-scale honesty: separate "authored" from "reviewed/enabled" so senior IC impact
+- [x] Career timeline render — the narrative across companies, not just one repo's charts
+      (Markdown; a career HTML page waits for v1.0's gallery)
+- [x] More adapters: GitLab reviews, Sentry, PagerDuty, GitHub Actions/CircleCI
+- [x] Team-scale honesty: separate "authored" from "reviewed/enabled" so senior IC impact
       (unblocking others) is visible, not lost
+- Deferred: the adapter conformance kit (PLAN A1) ships with v1.0's authoring guide;
+  the batched-MCP call-count test (PLAN B1) needs a mock MCP harness — v0.7
 
-## v0.7 — The application pipeline, end to end
+## v0.7 — The application pipeline, end to end *(shipped)*
 
 From "I should switch" to "offer" without leaving the terminal.
 
-- [ ] `/recall apply` fetches posting URLs + light company research (stack, scale, domain)
-      to sharpen the tailoring
-- [ ] Application tracker: `.recall/applications.json` — company, role, status, artifacts;
-      `/recall status` shows the funnel
-- [ ] `/recall interview <company>` — mock-interview rehearsal loop: asks the likely
+- [x] `/recall apply` fetches posting URLs + light company research (stack, scale, domain)
+      to sharpen the tailoring — JD parses cached by content hash (`apply.js --jd`), and
+      the kit renderer (`apply.js --kit`) validates every requirement→evidence citation
+- [x] Application tracker: `.recall/applications.json` — company, role, status, artifacts;
+      `/recall status` shows the funnel (`track.js`: append-only event log, legal
+      transitions enforced at the single write path)
+- [x] `/recall interview <company>` — mock-interview rehearsal loop: asks the likely
       questions, critiques answers against the evidence, tightens the STAR stories
-- [ ] `/recall negotiate` — scope-and-impact brief for comp conversations, built from the
+- [x] `/recall negotiate` — scope-and-impact brief for comp conversations, built from the
       strongest measured evidence
-- [ ] Renderers: PDF, [JSON Resume](https://jsonresume.org), LinkedIn-section export
+- [x] Renderers: PDF, [JSON Resume](https://jsonresume.org), LinkedIn-section export
+      (`export.js` — pure code, offline; PDF via local headless Chrome)
+- Deferred (again): the batched-MCP call-count test (PLAN B1) still needs a mock MCP
+  harness — v0.8
 
 ## v0.8 — Always current
 

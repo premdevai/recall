@@ -1,0 +1,136 @@
+#!/usr/bin/env node
+// recall export — pure-code renderers from the evidence model. Zero model
+// tokens, zero network, zero dependencies. Reads .recall/evidence.json or a
+// career.json / filtered view from merge.js.
+//
+//   node export.js --json-resume [--evidence <file>] [--out resume.json]
+//   node export.js --linkedin    [--evidence <file>] [--out linkedin.md]
+//   node export.js --pdf [--html journey.html] [--out journey.pdf]   # local Chrome
+"use strict";
+
+const { execFileSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+
+const argv = process.argv.slice(2);
+const flag = (n) => argv.includes("--" + n);
+function opt(name, dflt) {
+  const i = argv.indexOf("--" + name);
+  return i >= 0 && argv[i + 1] ? argv[i + 1] : dflt;
+}
+function die(msg) { console.error("recall export: " + msg); process.exit(2); }
+
+// ---------- --pdf: print the rendered page with a local Chrome ----------
+if (flag("pdf")) {
+  const html = opt("html", "journey.html");
+  const out = opt("out", "journey.pdf");
+  if (!fs.existsSync(html)) die(html + " not found — run render.js first");
+  const chrome = (() => {
+    const cands = [process.env.CHROME,
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "/Applications/Chromium.app/Contents/MacOS/Chromium"].filter(Boolean);
+    for (const c of cands) if (fs.existsSync(c)) return c;
+    for (const c of ["google-chrome", "chromium-browser", "chromium", "chrome"]) {
+      try { execFileSync(process.platform === "win32" ? "where" : "which", [c], { stdio: "pipe" }); return c; } catch {}
+    }
+    return null;
+  })();
+  if (!chrome) die("no Chrome/Chromium found — open " + html + " in a browser and print to PDF, or set CHROME=<path>");
+  try {
+    execFileSync(chrome, ["--headless", "--disable-gpu", "--no-pdf-header-footer",
+      "--print-to-pdf=" + path.resolve(out), "file://" + path.resolve(html)],
+      { stdio: "pipe", timeout: 60000 });
+  } catch (e) { die("Chrome failed to print — " + (e.stderr ? e.stderr.toString().trim().split("\n").pop() : e.message)); }
+  if (!fs.existsSync(out) || !fs.statSync(out).size) die("Chrome produced no PDF");
+  console.error(`recall export: ${out} (${Math.round(fs.statSync(out).size / 1024)} KB)`);
+  process.exit(0);
+}
+
+// ---------- load evidence.json or career.json into one segment list ----------
+const EVIDENCE = opt("evidence", path.join(".recall", "evidence.json"));
+let ev;
+try { ev = JSON.parse(fs.readFileSync(EVIDENCE, "utf8")); }
+catch (e) { die("cannot read " + EVIDENCE + " — run a recall report first (" + e.message + ")"); }
+const isCareer = ev.kind === "career";
+const maxVer = isCareer ? 1 : 2;
+if (ev.schema_version && ev.schema_version > maxVer)
+  die(`${EVIDENCE} schema_version ${ev.schema_version} is newer than this tool (${maxVer}). Update recall: npx @premdevai/recall@latest`);
+
+// any source value other than "verified" (or evidence that is all type=self)
+// means self-reported — a typo must never promote a claim
+const isSelf = (a) => a.source ? a.source !== "verified" : (a.evidence || []).every((e) => e.type === "self");
+const accs = ev.accomplishments || [];
+if (!accs.length) die(EVIDENCE + " has no accomplishments — run a recall report first");
+for (const a of accs) a.source = isSelf(a) ? "self-reported" : "verified";
+
+const engineer = isCareer ? ev.engineer : ev.subject && ev.subject.engineer;
+if (!engineer) die(EVIDENCE + " has no engineer name");
+const mark = (a) => a.source === "self-reported" ? " (self-reported)" : "";
+const bullets = (list) => list.slice().sort((a, b) => b.confidence - a.confidence)
+  .slice(0, 8).map((a) => (a.resumeBullet || a.title) + mark(a));
+
+let segments; // newest first — résumé convention
+if (isCareer) {
+  segments = ev.segments.slice().sort((a, b) => ((b.from || "") < (a.from || "") ? -1 : 1)).map((s) => ({
+    name: s.employer, repo: s.repo, from: s.from, to: s.to, commits: s.commits,
+    highlights: bullets(accs.filter((a) => a.repo === s.repo && a.employer === s.employer)),
+  }));
+} else {
+  const t = (ev.subject && ev.subject.tenure) || {};
+  segments = [{
+    name: (ev.subject && (ev.subject.employer || ev.subject.repo)), repo: ev.subject.repo,
+    from: t.from, to: t.to, commits: (ev.stats && ev.stats.commits) || 0,
+    highlights: bullets(accs),
+  }];
+}
+const skills = (ev.skills || []);
+const totalCommits = isCareer ? ev.totals.commits : (ev.stats && ev.stats.commits) || 0;
+const verified = accs.filter((a) => a.source === "verified").length;
+
+// ---------- --json-resume ----------
+if (flag("json-resume")) {
+  const OUT = opt("out", "resume.json");
+  const resume = {
+    $schema: "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+    basics: {
+      name: engineer,
+      summary: `${accs.length} evidence-backed accomplishments (${verified} verified) across ${segments.length} ${segments.length === 1 ? "repository" : "repositories"}; ${totalCommits} commits of record. Generated by Recall — every claim traces to a commit, PR, ticket, or metric.`,
+    },
+    work: segments.map((s) => {
+      const w = { name: s.name, highlights: s.highlights };
+      if (s.from) w.startDate = String(s.from).slice(0, 10);
+      if (s.to) w.endDate = String(s.to).slice(0, 10);
+      if (s.commits) w.summary = `${s.commits} commits in ${s.repo}`;
+      return w;
+    }),
+    skills: skills.map((s) => {
+      const k = { name: s.name };
+      if (s.subtitle) k.keywords = s.subtitle.split("·").map((x) => x.trim()).filter(Boolean);
+      return k;
+    }),
+  };
+  fs.writeFileSync(OUT, JSON.stringify(resume, null, 2));
+  console.error(`recall export: ${OUT} — ${resume.work.length} work entries, ${resume.skills.length} skills`);
+  process.exit(0);
+}
+
+// ---------- --linkedin ----------
+if (flag("linkedin")) {
+  const OUT = opt("out", "linkedin.md");
+  const mLabel = (iso) => iso ? ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+String(iso).slice(5, 7) - 1] + " " + String(iso).slice(0, 4) : "?";
+  let md = `# LinkedIn sections — ${engineer}\n\n`;
+  md += `## About\n\nEngineer with ${totalCommits} commits of record across ${segments.length} ${segments.length === 1 ? "repository" : "repositories"} — ${accs.length} evidence-backed accomplishments, ${verified} independently verified. Highlights:\n\n`;
+  for (const h of bullets(accs).slice(0, 3)) md += `- ${h}\n`;
+  md += `\n## Experience\n`;
+  for (const s of segments) {
+    md += `\n### ${s.name} · ${mLabel(s.from)} → ${mLabel(s.to)}\n\n`;
+    for (const h of s.highlights) md += `- ${h}\n`;
+  }
+  if (skills.length) md += `\n## Skills\n\n${skills.map((s) => s.name).join(" · ")}\n`;
+  md += `\n---\n<sub>Generated by Recall. Self-reported items are marked; everything else traces to a commit, PR, ticket, or metric.</sub>\n`;
+  fs.writeFileSync(OUT, md);
+  console.error(`recall export: ${OUT}`);
+  process.exit(0);
+}
+
+die("pass --json-resume, --linkedin, or --pdf");

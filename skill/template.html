@@ -254,6 +254,12 @@
     [data-reveal] { opacity: 1; transform: none; transition: none; }
     .track > i, .spark, .hbar .hfill { transition: none; opacity: 1; }
   }
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+    .grain, .toggle, .progress { display: none; }
+    .story, .stat, .signal, .act { break-inside: avoid; }
+  }
 </style>
 </head>
 <body>
@@ -445,6 +451,12 @@
   function countUp(el){ var t=+el.getAttribute('data-count'), s=performance.now(), d=1300; function step(n){ var p=Math.min((n-s)/d,1), e=1-Math.pow(1-p,3); el.textContent=Math.round(t*e).toLocaleString(); if(p<1) requestAnimationFrame(step); } requestAnimationFrame(step); }
   var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(!e.isIntersecting) return; e.target.classList.add('in'); e.target.querySelectorAll('[data-count]').forEach(function(c){ reduce ? c.textContent=(+c.getAttribute('data-count')).toLocaleString() : countUp(c); }); io.unobserve(e.target); }); }, {threshold:.15});
   document.querySelectorAll('[data-reveal]').forEach(function(el){ io.observe(el); });
+
+  // print / PDF export: reveal everything and finalize counters before rasterizing
+  addEventListener('beforeprint', function(){
+    document.querySelectorAll('[data-reveal]').forEach(function(el){ el.classList.add('in'); });
+    document.querySelectorAll('[data-count]').forEach(function(c){ c.textContent=(+c.getAttribute('data-count')).toLocaleString(); });
+  });
 
   var SVGNS='http://www.w3.org/2000/svg';
   document.querySelectorAll('[data-spark]').forEach(function(el){

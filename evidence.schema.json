@@ -9,8 +9,8 @@
   "properties": {
     "schema_version": {
       "type": "integer",
-      "const": 1,
-      "description": "Contract version. Renderers refuse files newer than they understand."
+      "enum": [1, 2],
+      "description": "Contract version. Renderers refuse files newer than they understand. Write 2: version 1 predates accomplishment.source, and marking self-reported claims is load-bearing — v1-only renderers must refuse rather than silently render them as verified."
     },
     "signals": {
       "type": "array",
@@ -46,6 +46,7 @@
       "properties": {
         "engineer": { "type": "string", "description": "Display name of the engineer." },
         "repo": { "type": "string", "description": "Repository or product identifier, e.g. \"acme/web\"." },
+        "employer": { "type": "string", "description": "Employer/company for this repo — used by the career store to segment and (on request) exclude or anonymize. Defaults to repo." },
         "tenure": {
           "type": "object",
           "additionalProperties": false,
@@ -57,7 +58,7 @@
         "sources": {
           "type": "array",
           "description": "Which source adapters actually contributed data to this run.",
-          "items": { "type": "string", "enum": ["git", "github", "gitlab", "bitbucket", "jira", "linear", "datadog", "ci"] }
+          "items": { "type": "string", "enum": ["git", "github", "gitlab", "bitbucket", "jira", "linear", "datadog", "sentry", "pagerduty", "ci", "self"] }
         },
         "generatedAt": { "type": "string", "format": "date-time" }
       }
@@ -148,6 +149,7 @@
             }
           },
           "resumeBullet": { "type": "string", "description": "One crisp line ready to paste into a résumé." },
+          "source": { "type": "string", "enum": ["verified", "self-reported"], "default": "verified", "description": "self-reported = told to Recall by the user (talks, mentoring, on-call), not derivable from a connected source. Always rendered with a marker, never counted as verified." },
           "confidence": {
             "type": "integer",
             "minimum": 0,
@@ -163,7 +165,7 @@
               "required": ["type", "ref"],
               "additionalProperties": false,
               "properties": {
-                "type": { "type": "string", "enum": ["commit", "pr", "issue", "ticket", "review", "metric", "deploy"] },
+                "type": { "type": "string", "enum": ["commit", "pr", "issue", "ticket", "review", "metric", "deploy", "incident", "self"] },
                 "ref": { "type": "string", "description": "sha, PR/issue number, ticket key, dashboard name..." },
                 "url": { "type": "string", "format": "uri", "description": "Optional deep link." },
                 "detail": { "type": "string", "description": "For type=metric: the measurement, e.g. \"p75 5.2s → 2.1s\"." }
@@ -171,6 +173,18 @@
             }
           }
         }
+      }
+    },
+
+    "enabled": {
+      "type": "object",
+      "description": "Impact through others — reviews, approvals, unblocking. Kept separate from authored stats so senior-IC leverage is visible, never mixed into commit counts.",
+      "additionalProperties": false,
+      "properties": {
+        "prsReviewed": { "type": "integer", "minimum": 0 },
+        "reviews": { "type": "integer", "minimum": 0, "description": "Review comments left." },
+        "approvals": { "type": "integer", "minimum": 0 },
+        "highlights": { "type": "array", "items": { "type": "string" }, "description": "e.g. \"Primary reviewer for the payments service (214 reviews)\"." }
       }
     },
 

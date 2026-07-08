@@ -186,6 +186,8 @@ const digest = {
   schema_version: 1,
   identity: { name: displayName, emails: [...emails] },
   repo: path.basename(REPO),
+  // roots sorted so multi-root repos stay stable as histories merge
+  repo_id: git(["rev-list", "--max-parents=0", "HEAD"]).trim().split("\n").sort()[0].slice(0, 12),
   head_sha: git(["rev-parse", "HEAD"]).trim(),
   range: { from: first, to: last },
   totals: { commits: commits.length, insertions: totIns, deletions: totDel,
@@ -213,6 +215,11 @@ try {
     console.error("note: added .recall/ to .gitignore");
   }
 } catch {}
+
+// a shallow clone's "root" is the graft boundary, not the true first commit —
+// the career store would file this repo under a different id than a full clone
+if (fs.existsSync(path.join(REPO, ".git", "shallow")))
+  console.error("warning: shallow clone — career-store identity will not match a full clone of this repo");
 
 const kb = Math.round(fs.statSync(OUT).size / 102.4) / 10;
 console.error(
