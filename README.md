@@ -24,7 +24,7 @@ evidence is already there — in your commit history, your merged PRs, your clos
 dashboards. Recall reads it and turns it into proof: categorized by skill, written up as STAR
 stories, and scored so the typo fixes stay off your résumé.
 
-**[View a live sample →](https://claude.ai/code/artifact/fca84c58-4998-4aec-988b-89fa8212db3c)**
+**[View a live sample →](https://recall-flax.vercel.app/examples/journey)**
 &nbsp;·&nbsp; or see [`examples/journey.html`](examples/journey.html) and [`examples/journey.md`](examples/journey.md)
 
 ## What it does
