@@ -25,15 +25,17 @@ Jira/MCP discovery fix (ticket-key join, JQL sweep, auth-failure reporting) · `
 source manifest · `.recall/evidence.json` persistence + incremental runs · gap report ·
 job-switch modes (`roles`, `apply`, `bullets`, `star`) · presets · multi-repo.
 
-## v0.5 — Trust the output *(next)*
+## v0.5 — Trust the output *(shipped)*
 
-Make what exists reliable before adding surface.
+Make what exists reliable before adding surface. Also landed the core token-economy
+architecture early: `gather.js` (git → compact digest, no raw-log parsing) and `render.js`
+(evidence.json → both formats mechanically, model never retypes the template).
 
-- [ ] Example outputs for `roles` and `apply` in `examples/` — people buy what they can see
-- [ ] `evidence.json` schema versioning + validate persisted files before reuse
-- [ ] Identity aliases — engineers commit under 2–3 emails; honor `.mailmap`, ask once, store
-- [ ] `npm publish` via GitHub Action on tag — releases stop depending on a laptop
-- [ ] Self-check suite: run the skill against this repo in CI, assert the report parses
+- [x] Example outputs for `roles` and `apply` in `examples/` — people buy what they can see
+- [x] `evidence.json` schema versioning + validate persisted files before reuse
+- [x] Identity aliases — `.mailmap` honored and name-clusters merged automatically
+- [x] `npm publish` via GitHub Action on tag — releases stop depending on a laptop
+- [x] Self-check suite: 15 tests over a deterministic fixture repo + leak gate, in CI
 
 ## v0.6 — The full career, not one repo
 

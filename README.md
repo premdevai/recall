@@ -40,16 +40,20 @@ stories, and scored so the typo fixes stay off your résumé.
 ## How it works
 
 ```
-  sources ────────────►  evidence.json  ────────────►  renders
-  git (always)                 │                        ├── journey.html   (self-contained page)
-  GitHub / GitLab / Bitbucket  │   one schema:          └── journey.md     (paste-ready text)
-  Jira / Linear                │   accomplishments +
-  Datadog / observability      │   evidence[] +
-  CI / CD                      │   metrics{} + skills
+  gather.js (script, tokenless)      Claude (judgment only)         render.js (script, tokenless)
+  git history ──► digest.json ──►  reads digest + candidate   ──►  evidence.json ──► journey.html
+                  (~10–30 KB)      diffs + MCP tickets/PRs,                      └──► journey.md
+                                   writes evidence.json ONLY
 ```
 
-Extract once into a single evidence model; render as many formats as you like. Every MCP source
-is just an adapter that maps its records onto that model — add one without touching the renderers.
+The scripts do the mechanics; the model does the judgment. `gather.js` turns full git history
+into a compact digest (identity aliases merged via `.mailmap`, charts precomputed, candidate
+commits ranked, ticket keys extracted) so the model never parses raw logs — a **>100× input
+cut** on large repos. The model writes one file, `evidence.json`; `render.js` turns it into
+both output formats mechanically, so the design is guaranteed and output tokens stay tiny.
+
+Every MCP source is just an adapter that maps its records onto the evidence model — add one
+without touching the renderers.
 
 The model is a documented contract: [`evidence.schema.json`](evidence.schema.json) (JSON Schema),
 with a filled-in [`examples/evidence.json`](examples/evidence.json). A new **source adapter**

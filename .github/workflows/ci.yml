@@ -1,0 +1,17 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Leak gate (no personal identifiers in tracked files)
+        run: bash test/leak-check.sh
+      - name: Zero-dependency rule
+        run: node -e "const p=require('./package.json'); if (p.dependencies && Object.keys(p.dependencies).length) { console.error('dependencies must stay empty'); process.exit(1) }"
+      - name: Tests
+        run: node --test test/*.test.js

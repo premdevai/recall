@@ -1,27 +1,10 @@
 <!doctype html>
-<!--
-  RECALL RENDER TEMPLATE  —  THE LOCKED DESIGN. DO NOT RESTYLE.
-  =============================================================
-  This file is normally rendered MECHANICALLY by render.js (next to it):
-      node render.js --evidence .recall/evidence.json --out journey.html
-  render.js fills every VAR placeholder and SLOT marker from evidence.json +
-  digest.json. Do not hand-edit the output; regenerate it.
 
-  Manual fallback (only if node is unavailable): fill the placeholders and SLOTs
-  yourself, following examples/journey.html for the per-item markup.
-    1. Copy the entire <style> and <script> blocks VERBATIM. Never invent a
-       palette, font, or accent. The look is amber-on-warm-zinc with a mono
-       "terminal" voice. Purple / blue / emerald accents are FORBIDDEN.
-    2. One block per data item; delete sections with no data. For MCP metric
-       cards use the MCP COMPONENT LIBRARY at the bottom. Never fabricate.
-    3. Keep it a single self-contained file: inline everything, no external
-       requests.
--->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ENGINEER}} — Engineering Record ({{REPO}})</title>
+<title>Maya R — Engineering Record (fixture)</title>
 <style>
   :root {
     --bg: #0e0d0b; --bg-2: #141210; --panel: #191612; --line: #2a2620;
@@ -261,109 +244,111 @@
 <div class="progress" id="progress"></div>
 <button class="toggle" id="toggle" aria-label="Toggle color theme">Light</button>
 
-<!-- HERO ─ fill from subject + stats. Keep the terminal card. -->
+
 <header class="hero">
   <div class="wrap hero-grid">
     <div>
       <p class="eyebrow" data-reveal>Recall · engineering retrospective</p>
-      <h1 data-reveal style="--i:1">{{TENURE_YEARS}}, one repo,<br><span>{{COMMITS}} commits</span> of evidence.</h1>
-      <p class="lede" data-reveal style="--i:2">Everything {{ENGINEER}} demonstrably shipped in <b>{{REPO}}</b>, read straight from the history — not from memory.</p>
+      <h1 data-reveal style="--i:1">4 months, one repo,<br><span>108 commits</span> of evidence.</h1>
+      <p class="lede" data-reveal style="--i:2">Everything Maya R demonstrably shipped in <b>fixture</b>, read straight from the history — not from memory.</p>
       <div class="meta" data-reveal style="--i:3">
-        <div><div class="k">Engineer</div><div class="v">{{ENGINEER}}</div></div>
-        <div><div class="k">Repository</div><div class="v">{{REPO}}</div></div>
-        <div><div class="k">Tenure</div><div class="v num">{{FROM}} → {{TO}}</div></div>
+        <div><div class="k">Engineer</div><div class="v">Maya R</div></div>
+        <div><div class="k">Repository</div><div class="v">fixture</div></div>
+        <div><div class="k">Tenure</div><div class="v num">Jan 2024 → May 2024</div></div>
       </div>
     </div>
     <div class="term" data-reveal style="--i:2">
-      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><b>git log --author={{AUTHOR}} --stat</b></div>
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><b>git log --author=Maya R --stat</b></div>
       <div class="body">
-        <div><span class="c">$</span> <span class="g">recall ./{{REPO}} --author "{{AUTHOR}}"</span></div>
-        <div><span class="c">scanning {{COMMITS}} commits…</span></div>
-        <!-- SLOT:termlines — one <div><span class="p">→</span> …</div> per summary line -->
+        <div><span class="c">$</span> <span class="g">recall ./fixture --author "Maya R"</span></div>
+        <div><span class="c">scanning 108 commits…</span></div>
+<div><span class="p">→</span> <span class="g">14 PRs · 0 reviews · 0 issues</span></div>
+<div><span class="p">→</span> <span class="g">classified into </span><span class="a">1 skill areas</span></div>
+<div><span class="p">→</span> <span class="g">1 accomplishments · </span><span class="a">confidence ≥ 40</span></div>
         <div><span class="c">$</span> <span class="cursor"></span></div>
       </div>
     </div>
   </div>
 </header>
 
-<!-- STATS ─ one .stat per headline number the data can prove -->
+
 <section id="stats">
   <div class="wrap">
     <div class="shead" data-reveal><h2>The paper trail, counted.</h2><p>Objective signal pulled straight from git and your connected tools.</p></div>
     <div class="bento">
-      <!-- SLOT:stats — one .stat per headline number the data can prove; sizes: big/med/sm -->
+<div class="stat big" data-reveal><div class="n" data-count="108"><em>0</em></div><div class="l">Commits authored</div><div class="sub">Jan 2024 → May 2024</div></div>
+<div class="stat med" data-reveal><div class="n" data-count="14">0</div><div class="l">Pull requests merged</div></div>
+<div class="stat med" data-reveal><div class="n"><span data-count="0.6">0</span>k <span style="color:var(--faint)">/</span> <span style="color:var(--muted)" data-count="0">0</span>k</div><div class="l">Lines added / removed</div></div>
     </div>
   </div>
 </section>
 
-<!-- ACTIVITY ─ ALWAYS render; git alone provides this. Makes the page data-heavy even with no MCP.
-     data-timebars = commits per month (CSV, oldest→newest); data-labels = short month labels.
-     data-heat = commits per DAY (CSV, oldest→newest); data-start = ISO date of the first bar (a Monday). -->
+
 <section id="activity">
   <div class="wrap">
     <div class="shead" data-reveal><h2>Shipping cadence, in the open.</h2><p>Every bar and cell is a real commit from the log — the rhythm of the work across the whole tenure.</p></div>
     <div class="chart" data-reveal>
-      <div class="chead"><span class="ctitle">Commits per month</span><span class="cnote">{{TOTAL}} commits · {{MONTHS}} months</span></div>
-      <div data-timebars="{{CSV_MONTHLY_COUNTS}}" data-labels="{{CSV_MONTH_LABELS}}" data-unit="commits"></div>
+      <div class="chead"><span class="ctitle">Commits per month</span><span class="cnote">108 commits · 4 months</span></div>
+      <div data-timebars="29,28,28,28" data-labels="J'24,F,M,A" data-unit="commits"></div>
     </div>
     <div class="chart" data-reveal>
       <div class="chead"><span class="ctitle">Contribution heatmap</span><span class="cnote">one cell per day</span></div>
-      <div data-heat="{{CSV_DAILY_COUNTS}}" data-start="{{FIRST_MONDAY_ISO}}"></div>
+      <div data-heat="1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1" data-start="2024-01-01"></div>
       <div class="hlegend">Less <i style="background:var(--line)"></i><i style="background:var(--accent);opacity:.35"></i><i style="background:var(--accent);opacity:.55"></i><i style="background:var(--accent);opacity:.78"></i><i style="background:var(--accent)"></i> More</div>
     </div>
   </div>
 </section>
 
-<!-- SIGNALS ─ MCP metric cards. RENDER ONLY for connected sources. See library below. Delete the whole section if no metric source is connected. -->
+
 <section id="signals">
   <div class="wrap">
     <div class="shead" data-reveal><h2>Measured impact.</h2><p>Real before/after numbers from your observability and quality tools — not estimates.</p></div>
     <div class="signals">
-      <!-- SLOT:signals — one .signal per metric, markup from MCP COMPONENT LIBRARY. Whole section removed when empty. -->
+<div class="signal" data-reveal><span class="src">Jira</span><div class="mname">Tickets delivered</div><div class="delta"><span class="to">9</span></div><div class="row"><span>Epics</span><b>1</b></div></div>
     </div>
   </div>
 </section>
 
-<!-- SKILLS ─ one .prow per competency; counts from data, sparkline from activity -->
+
 <section id="skills">
   <div class="wrap">
     <div class="shead" data-reveal><h2>Depth you can defend in the room.</h2><p>Backed by real merged-PR and commit counts and a real activity trace — never a self-rating.</p></div>
-    <!-- Distribution: commits per area (data-hbars = "Area:count,Area:count,..."). Always render. -->
+    
     <div class="chart" data-reveal style="margin-bottom:24px">
       <div class="chead"><span class="ctitle">Where the commits went</span><span class="cnote">by area</span></div>
-      <div class="hbars" data-hbars="{{HBARS}}"></div>
+      <div class="hbars" data-hbars="web:28,infra:28,docs:28,api:28,root:1"></div>
     </div>
     <div class="tablewrap" data-reveal>
       <div class="proof">
         <div class="prow head"><span>Competency</span><span class="pralign-r">Merged PRs</span><span class="pralign-r">Commits</span><span>Activity</span><span class="pralign-r">Last touched</span></div>
-        <!-- SLOT:skillrows — one .prow per competency -->
+<div class="prow" data-reveal><div class="sk">API design<small>rest · pagination</small></div><div class="metric pralign-r">9</div><div class="metric pralign-r">40</div><div class="spark" data-spark="4,12,24"></div><div class="last">May 2024<i>2.2 yrs ago</i></div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- JOURNEY ─ phases as acts on the spine, then the full log -->
+
 <section id="journey">
   <div class="wrap">
     <div class="shead" data-reveal><h2>The arc your history already tells.</h2><p>The phases the log makes obvious — with the full commit-by-commit record underneath.</p></div>
     <div class="timeline">
-      <!-- SLOT:acts — one .act per phase, each with .milestones of .ms items -->
+<div class="act" data-reveal><div class="when num">Jan '24 → Mar '24</div><h3>Learning <b>the terrain</b></h3><p class="arc">Ramp-up and first features.</p><div class="milestones"><div class="ms"><div class="cat">API design</div><div class="t">Shipped paginated listing API</div><div class="d">Cut list-endpoint p95 payload 30x via cursor pagination.</div></div></div></div>
       <div class="fulltl" data-reveal>
-        <button class="expander" id="tlBtn" aria-expanded="false" aria-controls="fullLog"><span class="chev">›</span><span class="lbl">Open the full commit-by-commit timeline</span><span class="cnt">{{LOG_COUNT}} milestones</span></button>
+        <button class="expander" id="tlBtn" aria-expanded="false" aria-controls="fullLog"><span class="chev">›</span><span class="lbl">Open the full commit-by-commit timeline</span><span class="cnt">1 milestones</span></button>
         <div class="log" id="fullLog" hidden>
-          <!-- SLOT:logrows — one .logrow per milestone, newest first -->
+<div class="logrow"><span class="date">2024-02-10</span><span class="lchip">API design</span><span class="lt">Shipped paginated listing API</span><span class="lpr">#14</span></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- STORIES ─ flagship STAR stories, zig-zag. Use REAL metric numbers in Result when a source provides them. -->
+
 <section id="stories">
   <div class="wrap">
     <div class="shead" data-reveal><h2>Interview-ready, evidence-backed.</h2><p>The flagship work as STAR stories — each with the PR, the diff, and a confidence score.</p></div>
     <div class="stories">
-      <!-- SLOT:stories — one .story per flagship accomplishment -->
+<article class="story" data-reveal><div class="side"><div><div class="cat">API design</div><h3>Shipped paginated listing API</h3></div><div><div class="conf"><div class="lab"><span>Confidence</span><b class="num">85</b></div><div class="track"><i style="--w:85%"></i></div></div><div class="evidence" style="margin-top:18px"><span class="chip pr">PR #14</span><span class="chip">1 commit</span><span class="chip">PROJ-13</span></div></div></div><div class="body"><div class="star"><div class="lab">Situation</div><p>Endpoints returned unbounded lists &lt;at scale&gt;.</p></div><div class="star"><div class="lab">Task</div><p>Bound the payloads.</p></div><div class="star"><div class="lab">Action</div><p>Added cursor pagination.</p></div><div class="star res"><div class="lab">Result</div><p>p95 payload cut 30x.</p></div></div></article>
     </div>
   </div>
 </section>
@@ -372,64 +357,13 @@
   <div class="wrap fg">
     <div>
       <div class="brand">Re<span>call</span></div>
-      <p>{{FOOTER_PROVENANCE}} Every claim links to a commit, PR, ticket, or metric. Numbers without a linked metric source describe the change, not a measured delta.</p>
+      <p>Generated 2026-07-08 from git, jira. 1 low-confidence items filtered (&lt; 40). Every claim links to a commit, PR, ticket, or metric. Numbers without a linked metric source describe the change, not a measured delta.</p>
     </div>
-    <div class="cmd">$ recall ./{{REPO}} <b>--author "{{AUTHOR}}"</b></div>
+    <div class="cmd">$ recall ./fixture <b>--author "Maya R"</b></div>
   </div>
 </footer>
 
-<!--
-  ══════════════════ MCP COMPONENT LIBRARY ══════════════════
-  Copy a block into the SIGNALS section (or wherever it fits) once per data
-  item, ONLY for sources that are actually connected. Set the .src label to
-  the source. Choose the pct/pill class by whether the change is good/warn/crit.
 
-  ── DATADOG / CoreDash metric delta (LCP, latency, throughput) ──
-  <div class="signal" data-reveal>
-    <span class="src">Datadog</span>
-    <div class="mname">Dashboard LCP · p75</div>
-    <div class="delta"><span class="from">5.2s</span><span class="arrow">→</span><span class="to">2.1s</span></div>
-    <div class="pct good">−60% · measured over 30d RUM</div>
-    <div class="spark" data-spark="9,8,8,7,5,4,3,3,2,2"></div>
-  </div>
-
-  ── SENTRY error rate / crash-free ──
-  <div class="signal" data-reveal>
-    <span class="src">Sentry</span>
-    <div class="mname">Checkout crash-free sessions</div>
-    <div class="delta"><span class="from">98.1%</span><span class="arrow">→</span><span class="to">99.7%</span></div>
-    <div class="pct good">−84% crash volume after release 4.2</div>
-    <div class="spark" data-spark="2,3,2,4,3,2,1,1,1,0"></div>
-  </div>
-
-  ── Incident / on-call (PagerDuty, Datadog Incidents) ──
-  <div class="signal" data-reveal>
-    <span class="src">PagerDuty</span>
-    <div class="mname">Sev-2 incidents owned</div>
-    <div class="delta"><span class="to">2</span></div>
-    <div class="row"><span>Mean time to resolve</span><b>41 min</b></div>
-    <div class="row"><span>Status</span><span class="pill good">postmortems shipped</span></div>
-  </div>
-
-  ── CI / CD (GitHub Actions, CircleCI) ──
-  <div class="signal" data-reveal>
-    <span class="src">CI</span>
-    <div class="mname">Pipeline reliability</div>
-    <div class="delta"><span class="from">18%</span><span class="arrow">→</span><span class="to">3%</span></div>
-    <div class="pct good">failure rate, after Playwright migration</div>
-    <div class="row"><span>Deploy frequency</span><b>3.1 / day</b></div>
-  </div>
-
-  ── Jira / Linear delivery ──
-  <div class="signal" data-reveal>
-    <span class="src">Jira</span>
-    <div class="mname">Tickets delivered</div>
-    <div class="delta"><span class="to">73</span></div>
-    <div class="row"><span>Story points</span><b>212</b></div>
-    <div class="row"><span>Epics led</span><b>4</b></div>
-  </div>
-  ════════════════════════════════════════════════════════════
--->
 
 <script>
   var root = document.documentElement, btn = document.getElementById('toggle');

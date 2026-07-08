@@ -1,4 +1,5 @@
 {
+  "schema_version": 1,
   "subject": {
     "engineer": "Maya Ellison",
     "repo": "cobalt/cobalt-web",

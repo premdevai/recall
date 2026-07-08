@@ -1,6 +1,6 @@
 ---
 name: recall
-version: 0.4.0
+version: 0.5.0
 description: Reconstruct an engineer's demonstrable work from git history — and any connected MCP sources (GitHub/GitLab/Bitbucket PRs, Jira/Linear tickets, Datadog/CI metrics) — into a categorized, evidence-backed, interview-ready record, rendered as a self-contained HTML page or a Markdown file. Also powers the job-switch pipeline — role-fit analysis (/recall roles), tailoring evidence to a job posting (/recall apply), résumé bullets (/recall bullets), and STAR rehearsal (/recall star). Use when the user asks to "summarize what I've built", "generate my brag doc / résumé bullets / interview prep", "what roles suit me", "tailor my resume to this job", "recall my work in this repo", prepares for a review or promotion packet, or invokes /recall.
 ---
 
@@ -25,62 +25,64 @@ load it first, then branch:
 | `/recall star <topic>` | One STAR story in rehearsal format |
 | `/recall last-year` / `for-promo` / `for-jobs` | Presets: timeframe 12mo / emphasis on impact+scope / runs `roles` after the report |
 
-## 1. Scope the run
+## 1. Scope the run — never ask what you can infer
 
-Infer what you can; ask only what you can't:
+**Zero questions is the goal.** Default everything, state the assumptions in one line, keep
+moving; the user corrects by replying, not by being interrogated:
 
-- **Repo** — default to the current directory. Multiple paths given → aggregate them into one
-  evidence model (tag each accomplishment with its repo).
-- **Author identity** — default to `git config user.email` / `user.name`; confirm it matches them.
-- **Timeframe** — default to full history.
-- **Format** — `html`, `md`, or both. If unspecified, ask once; otherwise default to `html`.
+- **Repo** — the current directory. Multiple paths given → aggregate (tag each accomplishment
+  with its repo).
+- **Author identity** — `gather.js` resolves it from `git config` and merges `.mailmap`
+  aliases automatically. Only stop if it exits 2 (no match) — then show its author list.
+- **Timeframe** — full history. Presets override.
+- **Format** — always produce BOTH `journey.html` and `journey.md`; the renderer makes the
+  second format free.
 
-**Print a source manifest before gathering** so the user can fix connections *before* the run,
-not after a disappointing report:
-
-```
-Sources for this run:
-  git     ✓  412 commits by you@example.com
-  Jira    ✓  found via ToolSearch — will fetch tickets
-  GitHub  ✗  no tools found — PRs and reviews will be missing
-```
-
-If a source they'd expect is missing, pause once and ask whether to proceed git-only or fix it.
-
-## 2. Gather evidence
-
-**Always — git (local, no dependencies):**
+**Print a source manifest, then proceed** — never wait for permission:
 
 ```
-git log --author=<id> -p --stat --date=short
+Sources: git ✓ 412 commits (you@example.com + 1 alias) · Jira ✓ · GitHub ✗ not connected
 ```
 
-Read the commit message *and the diff*. Infer real intent from the diff — a message of
-"fix bug" tells you nothing; the diff tells you everything (e.g. a diff that adds a windowing
-library and a row-height cache is "introduced list virtualization", not "fix bug").
+Missing sources are handled by the gap report at the end, not by blocking the run.
 
-**Opportunistically — whatever MCP servers are already connected.** MCP tools are usually
-*deferred*: they will NOT appear in your loaded tool list, so "I don't see a Jira tool" is not
-evidence that Jira isn't connected. Do this, in order:
+## 2. Gather evidence — scripts do the mechanics, you do the judgment
 
-1. **Extract ticket keys from git first** — they are the join between commits and tickets:
-   ```
-   git log --author=<id> --pretty='%s%n%b' | grep -oE '\b[A-Z][A-Z0-9]{1,9}-[0-9]+\b' | sort -u
-   git branch -a --format='%(refname:short)' | grep -oE '\b[A-Z][A-Z0-9]{1,9}-[0-9]+\b' | sort -u
-   ```
-2. **Discover tools with ToolSearch** — run queries like `jira issue`, `linear issue`,
-   `pull request`, `datadog metric`, `sentry` and load whatever matches.
-3. **Query each source found:**
-   - *Jira*: fetch every extracted key directly (`getJiraIssue`), then sweep with JQL —
+**Step 1 — run the gather script** (it sits next to this SKILL.md; zero dependencies):
+
+```
+node <skill-dir>/gather.js --repo <path>          # add --author <id> only if config identity is wrong
+```
+
+It writes `.recall/digest.json` (~10–30 KB): identity + merged aliases, totals, all chart
+arrays precomputed, every ticket key with sample shas, and a ranked **candidates** list —
+the commits whose churn marks them as probable accomplishments. **Never run
+`git log -p` over full history yourself** — the digest exists so you don't burn tokens
+parsing raw logs.
+
+**Step 2 — read diffs for candidates only.** For each digest candidate (batch them):
+
+```
+git show --stat -p --max-count=1 <sha>   # cap: skip diffs beyond ~400 lines; the stat tells you enough
+```
+
+Infer real intent from the diff — a message of "fix bug" tells you nothing; a diff adding a
+windowing library and a row-height cache is "introduced list virtualization".
+
+**Step 3 — MCP sources.** MCP tools are usually *deferred*: they will NOT appear in your
+loaded tool list, so "I don't see a Jira tool" is not evidence that Jira isn't connected:
+
+1. **Discover tools with ToolSearch** — `jira issue`, `linear issue`, `pull request`,
+   `datadog metric`, `sentry`; load what matches.
+2. **Query in batches** using `digest.tickets` as the join:
+   - *Jira*: one JQL per ~50 keys — `key in (PROJ-1, PROJ-2, …)` — then one sweep:
      `assignee = "<user email>" AND resolutiondate >= "<start>" ORDER BY resolved DESC`.
-     Pull summary, status, resolution, story points, and acceptance criteria into the
-     matching accomplishment.
+     Never fetch tickets one call at a time.
    - *Linear*: issues assigned to the user in the timeframe.
-   - *GitHub / GitLab / Bitbucket*: merged PRs authored by the user; reviews and approvals given.
-4. **Report source status honestly.** If a tool call fails with an auth error, tell the user
-   once ("Jira is connected but needs authentication — reconnect it to include tickets") and
-   move on. Skip silently only when discovery finds no tools for a source at all. Never
-   require a source, never fabricate one.
+   - *GitHub / GitLab / Bitbucket*: merged PRs authored by the user; reviews given.
+3. **Report source status honestly.** Auth error → tell the user once ("Jira is connected
+   but needs authentication — reconnect to include tickets") and continue. Skip silently
+   only when discovery finds no tools for a source. Never require, never fabricate.
 
 What each source adds:
 
@@ -111,68 +113,34 @@ Also derive a **skills table**: per competency, the real merged-PR and commit co
 activity trace over the timeframe, and when it was last touched. Counts come from the data —
 never a self-assessed 0–100 score.
 
-**Persist the model.** Write the dataset to `.recall/evidence.json` in the repo (shape:
-`evidence.schema.json`; add `generated_at` and `head_sha`). It is the input to every other
-mode and to the next run. Suggest adding `.recall/` to `.gitignore` once.
+**Write ONE file: `.recall/evidence.json`** (shape: `evidence.schema.json`, with
+`"schema_version": 1`). This is your single deliverable — the renderer derives both output
+formats from it mechanically. Include `signals[]` for any measured MCP metrics. gather.js
+already added `.recall/` to `.gitignore`.
 
-**Incremental runs.** If `.recall/evidence.json` already exists, don't rescan history — gather
-only commits after its `head_sha` (`git log <head_sha>..HEAD --author=<id>`), merge the new
-accomplishments in, and re-run the MCP sweep only for new ticket keys. Tell the user what was
-reused vs freshly scanned. `--full` forces a rescan.
+**Incremental runs.** If `.recall/evidence.json` already exists, re-run gather.js (fast,
+tokenless), then judge only candidates newer than the previous evidence — merge new
+accomplishments in, keep prior ones untouched, and re-query MCP only for new ticket keys.
+Tell the user what was reused. `--full` in the request forces a full re-judgment.
 
-## 4. Render — use the locked template, do not invent a design
+## 4. Render — one command, never by hand
 
-**HTML output MUST be built from `template.html`, which sits next to this file.**
-Read it and follow its header instructions. This is not a style suggestion — it is the design.
+```
+node <skill-dir>/render.js --evidence .recall/evidence.json --digest .recall/digest.json
+```
 
-- **Copy the entire `<style>` and `<script>` blocks from `template.html` VERBATIM.** Do not
-  write your own CSS. Do not change the palette, fonts, radii, or spacing.
-- **The look is amber (`#d29a4a`) on warm near-black/paper, with a monospace "terminal" voice.**
-  Purple, blue, indigo, violet, emerald, and teal accents are **FORBIDDEN** — if you find
-  yourself writing a hex like `#7b4dff`, `#6366f1`, or `#0ea5a4`, you have gone wrong; stop and
-  copy the template's tokens instead. Generic `system-ui`-only pages are also wrong.
-- Fill the placeholders (`{{...}}`) with real evidence. Duplicate a block (`.stat`, `.prow`,
-  `.story`, `.logrow`, `.signal`) once per data item; delete blocks you have no data for.
-- Keep it a single self-contained file: inline everything, no external requests, theme-aware,
-  responsive. Keep the reveal / count-up / sparkline script intact.
-- Filter low-confidence trivia (default threshold 40; keep everything if asked); sort by
-  confidence within each category.
+This produces **both** `journey.html` (the locked amber design, charts filled from the
+digest, low-confidence items filtered at 40 — pass `--min-confidence` to change) and
+`journey.md` (paste-ready mirror with unicode sparklines). **Do not write the HTML or the
+Markdown yourself** — the renderer guarantees the design, escapes content, reconciles every
+chart with the digest, and removes sections with no data (Signals, etc.). If it exits
+non-zero, fix `evidence.json` (its error says what's wrong) and re-run.
 
-### Charts — always render these (git alone provides them)
-
-Do not ship a numbers-and-text page. `template.html` includes chart components that make the
-report data-heavy even with no MCP connected. Compute the arrays from git and fill them:
-
-- **Commits per month** (`data-timebars` = counts oldest→newest, `data-labels` = short month
-  labels) and the **contribution heatmap** (`data-heat` = one integer per day oldest→newest,
-  `data-start` = ISO date of the first cell, snapped back to a Monday):
-  ```
-  git log --author=<id> --date=format:'%Y-%m' --pretty=%ad | sort | uniq -c   # monthly
-  git log --author=<id> --date=short --pretty=%ad | sort | uniq -c            # per-day
-  ```
-  Expand the per-day counts into a *dense* CSV — every day in range, zeros included — so the grid
-  is continuous. For long tenures, the heatmap may cover the most recent ~12 months; say so in the
-  card note.
-- **Where the commits went** (`data-hbars` = `"Area:count,Area:count,…"`): commits per skill area.
-- Skill-row sparklines: use evenly-bucketed counts (commits per quarter), never a single raw
-  total — one giant bucket collapses the rest into a flatline.
-
-The template's JS turns these attributes into SVG with hover tooltips; you only supply the numbers,
-and they must reconcile with the headline stats. Never fabricate counts.
-
-### Dynamic MCP components
-
-`template.html` ends with an **MCP COMPONENT LIBRARY** — pre-styled blocks for Datadog / CoreDash
-metric deltas, Sentry error rates, incidents (PagerDuty), CI/CD reliability, and Jira/Linear
-delivery. For each connected source with data, copy the matching component into the **Signals**
-section, one per metric/incident. Choose the `good`/`warn`/`crit` status class honestly by whether
-the change is an improvement. **Remove the Signals section entirely if no metric source is
-connected** — never fabricate a measurement or a source badge.
-
-### Markdown output
-
-Portable and paste-ready, identical in detail to the HTML. Render sparklines as unicode blocks
-(`▁▂▃▄▅▆▇█`). Match the structure of `examples/journey.md` in this repo.
+**Manual fallback — only if `node` is genuinely unavailable:** build from `template.html`
+per its header instructions: copy `<style>`/`<script>` verbatim (the look is amber `#d29a4a`
+on warm near-black — purple/blue/emerald accents are FORBIDDEN), fill placeholders and
+SLOTs with real evidence following `examples/journey.html`, dense chart CSVs that reconcile
+with the stats, one MCP-library component per measured metric, never fabricate.
 
 ### End every run with a gap report
 

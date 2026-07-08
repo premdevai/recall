@@ -7,6 +7,37 @@
   "required": ["subject", "accomplishments"],
   "additionalProperties": false,
   "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Contract version. Renderers refuse files newer than they understand."
+    },
+    "signals": {
+      "type": "array",
+      "description": "Measured metric cards for the Signals section — ONLY from connected metric sources (Datadog, Sentry, CI, Jira). Never fabricated.",
+      "items": {
+        "type": "object",
+        "required": ["source", "name", "to"],
+        "additionalProperties": false,
+        "properties": {
+          "source": { "type": "string", "description": "e.g. \"Datadog\", \"Jira\", \"CI\"." },
+          "name": { "type": "string", "description": "e.g. \"LCP p75\", \"Tickets delivered\"." },
+          "from": { "type": ["string", "number"], "description": "Before value; omit for absolute counts." },
+          "to": { "type": ["string", "number"], "description": "After / current value." },
+          "caption": { "type": "string", "description": "One-line context, e.g. \"after the image pipeline rework\"." },
+          "status": { "type": "string", "enum": ["good", "warn", "crit"], "default": "good", "description": "Chosen honestly by whether the change is an improvement." },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "value"],
+              "additionalProperties": false,
+              "properties": { "label": { "type": "string" }, "value": { "type": ["string", "number"] } }
+            }
+          }
+        }
+      }
+    },
     "subject": {
       "type": "object",
       "description": "Who and what this record is about.",
