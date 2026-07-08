@@ -176,8 +176,9 @@ provider and key. No servers, no telemetry, no account. Your history stays yours
 
 ## Roadmap
 
-- Additional renderers (PDF, [JSON Resume](https://jsonresume.org))
-- More source adapters (GitLab reviews, PagerDuty, Sentry)
+See [ROADMAP.md](ROADMAP.md) — next up: example outputs for the job modes, identity
+aliases, schema validation, and CI-published releases; then the full career store and the
+end-to-end application pipeline.
 
 ## Contributing
 
