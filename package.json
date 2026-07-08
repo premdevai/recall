@@ -1,6 +1,6 @@
 {
   "name": "@premdevai/recall",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Reconstruct everything you've demonstrably built from git history and your connected tools into an interview-ready, evidence-backed HTML page or Markdown file. Installs as a Claude Code skill.",
   "bin": {
     "recall": "bin/install.js"
@@ -8,7 +8,6 @@
   "files": [
     "bin",
     "skill",
-    "evidence.schema.json",
     "README.md",
     "LICENSE"
   ],

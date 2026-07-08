@@ -1,0 +1,11 @@
+{
+  "name": "recall",
+  "version": "1.0.0",
+  "description": "Turn git history and connected tools into an evidence-backed career record — brag doc, résumé bullets, role fit, application kits, interview prep.",
+  "author": { "name": "premdevai", "url": "https://github.com/premdevai" },
+  "homepage": "https://recall-flax.vercel.app",
+  "repository": "https://github.com/premdevai/recall",
+  "license": "MIT",
+  "keywords": ["career", "resume", "brag-doc", "interview-prep", "git"],
+  "skills": "./skill"
+}

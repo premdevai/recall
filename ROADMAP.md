@@ -88,12 +88,19 @@ A brag doc is only useful if it exists *before* you need it.
 - Deferred (again): the batched-MCP call-count test (PLAN B1) still needs a mock MCP
   harness — v1.0 alongside the adapter conformance kit
 
-## v1.0 — Ecosystem
+## v1.0 — Ecosystem *(shipped)*
 
-- [ ] Claude Code plugin-marketplace listing
-- [ ] Adapter authoring guide — a community source adapter should be a one-file PR
-- [ ] Docs site with output gallery (the Vercel site grows up)
-- [ ] Opt-in shareable report links — explicit publish step, never a default
+- [x] Claude Code plugin-marketplace listing (`.claude-plugin/plugin.json` +
+      `marketplace.json`; version stamps CI-checked against package.json and SKILL.md)
+- [x] Adapter authoring guide — a community source adapter is a one-file PR
+      ([ADAPTERS.md](ADAPTERS.md) + `conform.js`, which reads its rules from
+      `evidence.schema.json` so the contract stays stated once)
+- [x] Opt-in shareable report links — `share.js`: preview + leak scan first, publish only
+      on `--confirm`, endpoint always user-chosen, byte-identical to the reviewed preview
+- [x] SECURITY.md threat model + version-support policy
+- Deferred: docs-site output gallery (the Vercel page as-is still serves; grow it when
+      there are community adapters to list) · token-budget CI check and the mock-MCP
+      call-count test (B1) need a model-in-the-loop harness this repo doesn't have
 
 ## Explicitly not doing
 

@@ -55,7 +55,7 @@ both output formats mechanically, so the design is guaranteed and output tokens 
 Every MCP source is just an adapter that maps its records onto the evidence model — add one
 without touching the renderers.
 
-The model is a documented contract: [`evidence.schema.json`](evidence.schema.json) (JSON Schema),
+The model is a documented contract: [`evidence.schema.json`](skill/evidence.schema.json) (JSON Schema),
 with a filled-in [`examples/evidence.json`](examples/evidence.json). A new **source adapter**
 writes this shape; a new **renderer** reads it. That's the whole extension surface.
 

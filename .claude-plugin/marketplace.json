@@ -1,0 +1,12 @@
+{
+  "name": "recall-marketplace",
+  "owner": { "name": "premdevai", "url": "https://github.com/premdevai" },
+  "plugins": [
+    {
+      "name": "recall",
+      "source": "./",
+      "description": "Turn git history and connected tools into an evidence-backed career record — brag doc, résumé bullets, role fit, application kits, interview prep.",
+      "version": "1.0.0"
+    }
+  ]
+}

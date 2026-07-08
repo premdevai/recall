@@ -1,6 +1,6 @@
 ---
 name: recall
-version: 0.8.0
+version: 1.0.0
 description: Reconstruct an engineer's demonstrable work from git history — and any connected MCP sources (GitHub/GitLab/Bitbucket PRs, Jira/Linear tickets, Datadog/CI metrics) — into a categorized, evidence-backed, interview-ready record, rendered as a self-contained HTML page or a Markdown file. Also powers the job-switch pipeline end to end — role-fit analysis (/recall roles), tailoring evidence to a job posting (/recall apply), the application funnel (/recall status), mock-interview rehearsal (/recall interview), comp-conversation briefs (/recall negotiate), résumé bullets (/recall bullets), STAR rehearsal (/recall star), and PDF / JSON Resume / LinkedIn exports. Use when the user asks to "summarize what I've built", "generate my brag doc / résumé bullets / interview prep", "what roles suit me", "tailor my resume to this job", "track my applications", "recall my work in this repo", "my career timeline", prepares for a review or promotion packet, or invokes /recall. /recall career merges evidence across repos and employers from the local store; /recall add records non-git work (talks, mentoring, on-call) as marked self-reported evidence.
 ---
 
@@ -30,6 +30,7 @@ load it first, then branch:
 | `/recall interview <company>` | Mock-interview rehearsal against the stored kit — §7 |
 | `/recall negotiate` | Scope-and-impact brief for comp conversations — §7 |
 | `/recall since-last` | What shipped since the last packet — §8 |
+| `/recall share <endpoint url>` | Publish the report — preview first, explicit confirm, never a default — §9 |
 
 ## 1. Scope the run — never ask what you can infer
 
@@ -359,6 +360,28 @@ last review":
 
 Never poll sources on a schedule yourself — refresh is pull-only and local; MCP re-queries
 happen only inside a real report run.
+
+## 9. Share — opt-in, previewed, never a default
+
+Only when the user explicitly asks to publish. Sensitive report? Rebuild the input with
+`--exclude-employer` / `--anonymize` and re-render BEFORE sharing — redaction happens in
+the data, not the HTML. Then two steps, never one:
+
+```
+node <skill-dir>/share.js --html journey.html --to <their endpoint>   # writes share-preview.html, publishes NOTHING
+```
+
+Show the user its report (the emails and link hosts it found in the page) and tell them to
+open the preview. Only after they confirm in so many words:
+
+```
+node <skill-dir>/share.js --confirm --to <endpoint>
+```
+
+This posts exactly the reviewed bytes — even if journey.html changed since — and prints
+the endpoint's response (the link). The endpoint is always theirs (own server or a paste
+service; suggest one with expiry). Never pick an endpoint for them, never publish to make
+a demo work.
 
 ## Rules
 
