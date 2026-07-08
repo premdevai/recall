@@ -4,6 +4,16 @@
 set -euo pipefail
 DIR="${1:-$(cd "$(dirname "$0")" && pwd)/tmp/fixture}"
 N="${COMMITS:-120}"
+
+# GitHub's Linux runners intermittently fail a git object write mid-build
+# ("unable to create temporary file: No such file or directory") — never seen
+# locally. ponytail: rebuild once from scratch instead of diagnosing the runner.
+if [ "${FIXTURE_ATTEMPT:-0}" = "0" ] && ! FIXTURE_ATTEMPT=1 bash "$0" "$@"; then
+  echo "fixture build failed once — retrying" >&2
+  exec env FIXTURE_ATTEMPT=1 bash "$0" "$@"
+fi
+[ "${FIXTURE_ATTEMPT:-0}" = "0" ] && exit 0
+
 rm -rf "$DIR"; mkdir -p "$DIR"; cd "$DIR"
 
 git init -q -b main
