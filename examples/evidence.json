@@ -3,40 +3,82 @@
   "subject": {
     "engineer": "Maya Ellison",
     "repo": "cobalt/cobalt-web",
+    "employer": "Cobalt",
     "tenure": { "from": "2023-08-01", "to": "2026-07-01" },
-    "sources": ["git", "github", "jira", "datadog"],
+    "sources": ["git", "github", "jira", "datadog", "ci"],
     "generatedAt": "2026-07-06T00:00:00Z"
   },
   "stats": {
-    "commits": 2347,
+    "commits": 2734,
     "prsMerged": 418,
     "issuesClosed": 273,
     "reviewComments": 1204,
-    "linesAdded": 214000,
-    "linesRemoved": 138000,
+    "linesAdded": 252000,
+    "linesRemoved": 160000,
     "releases": 39
   },
-  "skills": [
+  "signals": [
     {
-      "name": "React",
-      "subtitle": "components · hooks · context",
-      "prs": 141,
-      "commits": 812,
-      "lastTouched": "3 days ago",
-      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q2 '26", "values": [2, 3, 4, 5, 6, 6, 7, 7, 8, 8, 7, 8] }
+      "source": "Datadog",
+      "name": "Dashboard LCP · p75",
+      "from": "5.2s",
+      "to": "2.1s",
+      "caption": "after the virtualization rework",
+      "status": "good",
+      "rows": [
+        { "label": "Lighthouse perf", "value": "61 → 94" },
+        { "label": "Re-renders / interaction", "value": "−40%" }
+      ]
     },
     {
-      "name": "Performance",
-      "subtitle": "virtualization · bundle budgets",
-      "prs": 34,
-      "commits": 190,
-      "lastTouched": "2026-04-15",
-      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q2 '26", "values": [0, 1, 1, 3, 6, 9, 7, 4, 3, 2, 3, 2] }
+      "source": "CI",
+      "name": "Frontend build time",
+      "from": "14m 20s",
+      "to": "4m 05s",
+      "caption": "remote cache + dependency pruning",
+      "status": "good",
+      "rows": [
+        { "label": "Cache hit rate", "value": "89%" },
+        { "label": "CI cost / month", "value": "−62%" }
+      ]
+    },
+    {
+      "source": "Jira",
+      "name": "Tickets delivered",
+      "to": "214",
+      "caption": "across 11 epics · 3 years",
+      "status": "good",
+      "rows": [
+        { "label": "Bugs closed", "value": 96 },
+        { "label": "Stories shipped", "value": 118 }
+      ]
     }
   ],
+  "skills": [
+    { "name": "React", "subtitle": "components · hooks · suspense", "prs": 141, "commits": 701, "lastTouched": "2026-06-28",
+      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q3 '26", "values": [21, 38, 47, 55, 61, 66, 70, 68, 72, 75, 70, 45, 13] } },
+    { "name": "API design", "subtitle": "REST · pagination · versioning", "prs": 86, "commits": 538, "lastTouched": "2026-06-30",
+      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q3 '26", "values": [12, 24, 33, 41, 46, 50, 52, 55, 58, 60, 62, 35, 10] } },
+    { "name": "State & data flow", "subtitle": "query cache · optimistic UI", "prs": 54, "commits": 373, "lastTouched": "2026-05-19",
+      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q3 '26", "values": [8, 15, 24, 30, 34, 36, 38, 37, 39, 41, 40, 25, 6] } },
+    { "name": "Performance", "subtitle": "virtualization · bundle budgets", "prs": 34, "commits": 368, "lastTouched": "2026-04-15",
+      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q3 '26", "values": [4, 9, 18, 52, 66, 71, 58, 26, 22, 18, 15, 8, 1] } },
+    { "name": "Design system", "subtitle": "tokens · a11y · theming", "prs": 41, "commits": 346, "lastTouched": "2026-06-12",
+      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q3 '26", "values": [2, 5, 8, 12, 16, 20, 26, 48, 55, 58, 56, 33, 7] } },
+    { "name": "Testing", "subtitle": "vitest · playwright · contract tests", "prs": 38, "commits": 233, "lastTouched": "2026-06-25",
+      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q3 '26", "values": [5, 10, 14, 18, 20, 22, 23, 24, 25, 26, 24, 18, 4] } },
+    { "name": "Infra & CI", "subtitle": "pipelines · caching · previews", "prs": 16, "commits": 98, "lastTouched": "2026-03-02",
+      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q3 '26", "values": [1, 3, 5, 7, 9, 12, 14, 11, 10, 12, 9, 4, 1] } },
+    { "name": "Docs & enablement", "subtitle": "runbooks · ADRs · onboarding", "prs": 8, "commits": 77, "lastTouched": "2026-05-30",
+      "activity": { "unit": "quarter", "from": "Q3 '23", "to": "Q3 '26", "values": [2, 4, 5, 6, 7, 8, 8, 7, 8, 9, 8, 4, 1] } }
+  ],
   "phases": [
+    { "key": "act-1", "title": "Learning the terrain", "from": "2023-08-01", "to": "2024-06-30",
+      "narrative": "Small, safe, everywhere — hundreds of commits across every corner of the app while the mental map forms." },
     { "key": "act-2", "title": "Taking ownership", "from": "2024-07-01", "to": "2025-08-31",
-      "narrative": "Commits get bigger and more surgical — Maya stops fixing symptoms and starts fixing systems." }
+      "narrative": "Commits get bigger and more surgical — Maya stops fixing symptoms and starts fixing systems." },
+    { "key": "act-3", "title": "Systems and scale", "from": "2025-09-01", "to": "2026-07-01",
+      "narrative": "The work turns multiplicative: platform pieces, review leverage, and the paths other engineers build on." }
   ],
   "accomplishments": [
     {
@@ -49,20 +91,173 @@
         "situation": "The ledger dashboard locked up rendering 5,000+ rows; support tickets called it \"frozen\".",
         "task": "Restore responsiveness without changing behavior or breaking the export path.",
         "action": "Introduced row virtualization, memoized the expensive cells, code-split the charts, and lazy-loaded the export module.",
-        "result": "First paint p75 5.2s -> 2.1s, 40% fewer renders, Lighthouse 61 -> 94."
+        "result": "First paint p75 5.2s → 2.1s, 40% fewer renders, Lighthouse 61 → 94."
       },
-      "resumeBullet": "Cut dashboard first-paint 60% (5.2s to 2.1s) by introducing row virtualization and render memoization.",
+      "resumeBullet": "Cut dashboard first-paint 60% (5.2s → 2.1s) by introducing row virtualization and render memoization.",
       "confidence": 97,
       "evidence": [
         { "type": "pr", "ref": "#1284", "url": "https://github.com/cobalt/cobalt-web/pull/1284" },
         { "type": "commit", "ref": "a3f9e1c" },
         { "type": "ticket", "ref": "COB-4471" },
-        { "type": "metric", "ref": "dashboard.lcp.p75", "detail": "5.2s -> 2.1s (Datadog RUM)" },
+        { "type": "metric", "ref": "dashboard.lcp.p75", "detail": "5.2s → 2.1s (Datadog RUM)" },
         { "type": "deploy", "ref": "v4.2.0" }
+      ]
+    },
+    {
+      "id": "api-v2-pagination",
+      "category": "API design",
+      "title": "Versioned the public API and killed the N+1 pagination",
+      "phase": "act-2",
+      "date": "2024-11-04",
+      "star": {
+        "situation": "Offset pagination collapsed above 100k records and blocked two enterprise deals.",
+        "task": "Ship /v2 with cursor pagination — zero breaking changes for 240 existing integrations.",
+        "action": "Designed the cursor contract, dual-served /v1 and /v2 behind a compatibility layer, added contract tests for every documented consumer path.",
+        "result": "p99 list latency 8.4s → 410ms on 100k-row accounts; zero breaking-change tickets filed post-launch."
+      },
+      "resumeBullet": "Shipped API /v2 (cursor pagination, zero breaking changes) — p99 list latency 8.4s → 410ms.",
+      "confidence": 94,
+      "evidence": [
+        { "type": "pr", "ref": "#1412", "url": "https://github.com/cobalt/cobalt-web/pull/1412" },
+        { "type": "commit", "ref": "7cd20b4" },
+        { "type": "ticket", "ref": "COB-4106" },
+        { "type": "metric", "ref": "api.list.p99", "detail": "8.4s → 410ms (Datadog APM)" }
+      ]
+    },
+    {
+      "id": "ci-build-cache",
+      "category": "Infra & CI",
+      "title": "Took the frontend build from 14 minutes to 4",
+      "phase": "act-3",
+      "date": "2025-10-13",
+      "star": {
+        "situation": "Every PR waited 14+ minutes for CI; engineers batched changes to avoid the queue, making reviews bigger and riskier.",
+        "task": "Get the feedback loop under 5 minutes without buying more runners.",
+        "action": "Introduced remote build caching, pruned 31 phantom dependencies, split the test matrix by change surface, and added preview deploys off the cache.",
+        "result": "Build p50 14m20s → 4m05s, 89% cache hit rate, CI spend down 62%."
+      },
+      "resumeBullet": "Cut CI build time 71% (14m → 4m) with remote caching and change-scoped test splitting; −62% CI spend.",
+      "confidence": 92,
+      "evidence": [
+        { "type": "pr", "ref": "#1955", "url": "https://github.com/cobalt/cobalt-web/pull/1955" },
+        { "type": "commit", "ref": "e11d9a0" },
+        { "type": "metric", "ref": "ci.build.p50", "detail": "14m20s → 4m05s (CI analytics)" }
+      ]
+    },
+    {
+      "id": "design-system-tokens",
+      "category": "Design system",
+      "title": "Built the token pipeline that ended per-page theming",
+      "phase": "act-3",
+      "date": "2025-11-20",
+      "star": {
+        "situation": "Four products themed themselves with copy-pasted CSS; a brand refresh was quoted at six weeks of manual edits.",
+        "task": "Make theming a data change, not a code change.",
+        "action": "Extracted 212 design tokens, generated platform outputs (CSS variables, TS constants) from one source, migrated 61 components, and wired a11y contrast checks into CI.",
+        "result": "The brand refresh shipped in 4 days; contrast violations in CI dropped to zero."
+      },
+      "resumeBullet": "Designed the 212-token theming pipeline that turned a 6-week brand refresh into a 4-day data change.",
+      "confidence": 90,
+      "evidence": [
+        { "type": "pr", "ref": "#2103", "url": "https://github.com/cobalt/cobalt-web/pull/2103" },
+        { "type": "commit", "ref": "90ab77e" },
+        { "type": "ticket", "ref": "COB-5210" }
+      ]
+    },
+    {
+      "id": "optimistic-sync",
+      "category": "State & data flow",
+      "title": "Rebuilt data flow around an optimistic query cache",
+      "phase": "act-2",
+      "date": "2025-03-17",
+      "star": {
+        "situation": "Every mutation refetched whole collections; the app felt like a page reload on every click.",
+        "task": "Make interactions instant while keeping the server as the source of truth.",
+        "action": "Introduced a normalized query cache with optimistic updates and rollback, plus a mutation queue for flaky connections.",
+        "result": "Interaction-to-feedback under 50ms across the app; refetch traffic down 78%."
+      },
+      "resumeBullet": "Made every interaction feel instant (<50ms feedback) with an optimistic query cache; −78% refetch traffic.",
+      "confidence": 88,
+      "evidence": [
+        { "type": "pr", "ref": "#1688", "url": "https://github.com/cobalt/cobalt-web/pull/1688" },
+        { "type": "commit", "ref": "b52ee19" },
+        { "type": "ticket", "ref": "COB-3988" }
+      ]
+    },
+    {
+      "id": "a11y-audit",
+      "category": "Design system",
+      "title": "Closed the accessibility audit — 94 findings to zero",
+      "phase": "act-3",
+      "date": "2026-02-09",
+      "star": {
+        "situation": "An enterprise prospect's accessibility audit returned 94 findings and a hard deadline in the contract.",
+        "task": "Reach zero open findings before the renewal date, and stay there.",
+        "action": "Fixed focus order and ARIA semantics across 40+ components, added keyboard paths to every interactive element, and made axe checks a merge gate.",
+        "result": "Zero open findings at renewal; the axe gate has blocked 23 regressions since."
+      },
+      "resumeBullet": "Closed a 94-finding accessibility audit to zero and gated CI so it stays there (23 regressions blocked since).",
+      "confidence": 89,
+      "evidence": [
+        { "type": "pr", "ref": "#2299", "url": "https://github.com/cobalt/cobalt-web/pull/2299" },
+        { "type": "commit", "ref": "4f60c2d" },
+        { "type": "ticket", "ref": "COB-5391" }
+      ]
+    },
+    {
+      "id": "onboarding-runbooks",
+      "category": "Docs & enablement",
+      "title": "Wrote the onboarding path new hires actually finish",
+      "phase": "act-1",
+      "date": "2024-04-02",
+      "resumeBullet": "Authored the frontend onboarding runbook — new-hire first-PR time dropped from 3 weeks to 4 days.",
+      "confidence": 74,
+      "evidence": [
+        { "type": "pr", "ref": "#901", "url": "https://github.com/cobalt/cobalt-web/pull/901" },
+        { "type": "commit", "ref": "23c81aa" }
+      ]
+    },
+    {
+      "id": "flaky-test-hunt",
+      "category": "Testing",
+      "title": "Deleted flakiness from the merge queue",
+      "phase": "act-1",
+      "date": "2024-05-28",
+      "resumeBullet": "Stabilized the merge queue: quarantined and fixed 41 flaky tests, retry rate 18% → 1.2%.",
+      "confidence": 81,
+      "evidence": [
+        { "type": "pr", "ref": "#1013", "url": "https://github.com/cobalt/cobalt-web/pull/1013" },
+        { "type": "commit", "ref": "6d0f5b2" },
+        { "type": "metric", "ref": "ci.retry.rate", "detail": "18% → 1.2% (CI analytics)" }
+      ]
+    },
+    {
+      "id": "conf-talk-frontend-perf",
+      "category": "Docs & enablement",
+      "title": "Spoke at a regional React meetup on the virtualization rework",
+      "phase": "act-3",
+      "date": "2025-09-25",
+      "source": "self-reported",
+      "resumeBullet": "Presented the dashboard-virtualization case study to ~200 engineers at a regional React meetup.",
+      "confidence": 55,
+      "evidence": [
+        { "type": "self", "ref": "told to recall 2026-07-06" }
       ]
     }
   ],
+  "enabled": {
+    "prsReviewed": 611,
+    "reviews": 1204,
+    "approvals": 388,
+    "highlights": [
+      "Primary reviewer for the payments surface (214 reviews)",
+      "Unblocked the mobile team's design-system adoption — 9 pairing sessions, 3 migration PRs reviewed end-to-end"
+    ]
+  },
   "ledger": [
-    { "group": "Performance", "items": ["List virtualization", "Route-level code splitting", "Image & font optimization", "Memoized render paths"] }
+    { "group": "Performance", "items": ["List virtualization", "Route-level code splitting", "Image & font optimization", "Memoized render paths", "Bundle budgets in CI"] },
+    { "group": "API & data", "items": ["Cursor pagination", "API versioning", "Normalized query cache", "Optimistic updates with rollback", "Contract tests"] },
+    { "group": "Platform", "items": ["Design tokens pipeline", "Remote build caching", "Preview deploys", "axe merge gate", "Merge-queue stabilization"] },
+    { "group": "Collaboration", "items": ["1,204 review comments", "Onboarding runbook", "ADR practice", "Incident write-ups"] }
   ]
 }

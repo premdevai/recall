@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Recall — turn your git history into interview-ready proof</title>
-<meta name="description" content="Reconstruct everything you've demonstrably built from git history and your connected tools into an interview-ready, evidence-backed HTML page or Markdown file.">
+<meta name="description" content="Reconstruct everything you've demonstrably built — from git history and connected tools — into an evidence-backed career record: brag doc, résumé, role fit, application kits, interview prep.">
 <meta property="og:title" content="Recall — turn your git history into interview-ready proof of impact">
-<meta property="og:description" content="From commits, PRs, metrics and tickets to a polished, evidence-backed page. Automatic. Yours.">
+<meta property="og:description" content="From commits, PRs, metrics and tickets to a polished, evidence-backed career record. Local-first. Yours.">
 <meta property="og:image" content="https://raw.githubusercontent.com/premdevai/recall/main/assets/recall-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -14,6 +14,7 @@
     --bg: #0e0d0b; --bg-2: #141210; --panel: #191612; --line: #2a2620;
     --ink: #ece6d8; --muted: #9a9082; --faint: #5f594f;
     --accent: #d29a4a; --accent-hi: #e8bd7a; --accent-dim: #7a5c2e;
+    --good: #6ea86a;
     --shadow: 0 30px 70px -34px rgba(0,0,0,.75);
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
@@ -23,6 +24,7 @@
     --bg: #f3ece0; --bg-2: #efe7d8; --panel: #fbf6ec; --line: #ddd2bf;
     --ink: #2a251d; --muted: #6f6656; --faint: #a89c86;
     --accent: #b07a26; --accent-hi: #8f6119; --accent-dim: #d8c39a;
+    --good: #3f7a3c;
     --shadow: 0 30px 70px -40px rgba(80,60,20,.3);
   }
   * { box-sizing: border-box; }
@@ -38,92 +40,138 @@
   .topbar { position: sticky; top: 0; z-index: 90; backdrop-filter: blur(10px); background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--line); }
   .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding-top: 15px; padding-bottom: 15px; gap: 18px; }
   .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; font-size: 1.15rem; letter-spacing: -.01em; }
-  .logo { width: 30px; height: 30px; border: 1.5px solid var(--accent); border-radius: 8px; display: grid; place-items: center; color: var(--accent); }
+  .logo { width: 30px; height: 30px; border: 1.5px solid var(--accent); border-radius: 8px; display: grid; place-items: center; color: var(--accent); flex: none; }
+  .ver { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; color: var(--accent); border: 1px solid var(--accent-dim); border-radius: 999px; padding: 3px 9px; margin-left: 2px; }
   .nav { display: flex; align-items: center; gap: 22px; }
-  .nav .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
-  .nav .chip svg { color: var(--accent); }
-  .badge { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent-dim); border-radius: 999px; padding: 6px 12px; }
+  .nav a.link { font-size: 13.5px; color: var(--muted); transition: color .2s; }
+  .nav a.link:hover { color: var(--accent); }
   .toggle { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; cursor: pointer; transition: color .2s, border-color .2s; }
   .toggle:hover { color: var(--accent); border-color: var(--accent-dim); }
   .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* hero */
-  .hero { padding: 72px 0 40px; }
-  .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 54px; align-items: center; }
-  .hero h1 { font-size: clamp(2.6rem, 5.4vw, 4.6rem); line-height: .98; letter-spacing: -.035em; font-weight: 800; margin: 18px 0 24px; text-wrap: balance; }
+  .hero { padding: 76px 0 44px; }
+  .hero-grid { display: grid; grid-template-columns: 1.02fr .98fr; gap: 54px; align-items: center; }
+  .hero h1 { font-size: clamp(2.6rem, 5.2vw, 4.4rem); line-height: .98; letter-spacing: -.035em; font-weight: 800; margin: 18px 0 24px; text-wrap: balance; }
   .hero h1 .am { color: var(--accent); display: block; }
-  .hero .lede { font-size: 1.14rem; color: var(--muted); max-width: 52ch; margin: 0; }
+  .hero .lede { font-size: 1.13rem; color: var(--muted); max-width: 54ch; margin: 0; }
   .hero .lede b { color: var(--ink); font-weight: 600; }
   .hero .lede .am { color: var(--accent); font-weight: 600; }
-  .feats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 30px; margin: 34px 0 30px; max-width: 560px; }
+  .feats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; margin: 32px 0 28px; max-width: 580px; }
   .feat { display: grid; grid-template-columns: 26px 1fr; gap: 12px; }
   .feat svg { color: var(--accent); margin-top: 2px; }
-  .feat .t { font-weight: 650; font-size: .98rem; }
-  .feat .d { color: var(--muted); font-size: .88rem; margin-top: 2px; }
-  .cmd { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 13.5px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 15px 16px; max-width: 560px; }
+  .feat .t { font-weight: 650; font-size: .97rem; }
+  .feat .d { color: var(--muted); font-size: .87rem; margin-top: 1px; }
+  .cmd { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 13.5px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; max-width: 580px; }
   .cmd .p { color: var(--faint); }
   .cmd .g { color: var(--ink); }
   .cmd .am { color: var(--accent); }
   .cmd .cp { margin-left: auto; font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 7px; padding: 6px 10px; cursor: pointer; transition: color .2s, border-color .2s; }
   .cmd .cp:hover { color: var(--accent); border-color: var(--accent-dim); }
 
-  /* browser preview card */
+  /* hero preview window with a LIVE chart */
   .window { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
   .window .bar { display: flex; align-items: center; gap: 8px; padding: 13px 16px; border-bottom: 1px solid var(--line); }
   .window .bar .d { width: 11px; height: 11px; border-radius: 50%; }
   .window .bar .d1 { background: #e0685f; } .window .bar .d2 { background: #e6b04a; } .window .bar .d3 { background: #63c363; }
   .window .bar .fn { margin-left: 10px; font-family: var(--mono); font-size: 12px; color: var(--faint); }
-  .window .content { padding: 26px 26px 28px; }
-  .window .brand { font-size: 1.05rem; }
-  .window h3 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); letter-spacing: -.025em; line-height: 1.02; margin: 14px 0 14px; font-weight: 750; }
+  .window .content { padding: 24px 26px 26px; }
+  .window h3 { font-size: clamp(1.4rem, 3vw, 1.9rem); letter-spacing: -.025em; line-height: 1.05; margin: 8px 0 18px; font-weight: 750; }
   .window h3 .am { color: var(--accent); }
-  .term { background: var(--bg-2); border: 1px solid var(--line); border-radius: 11px; font-family: var(--mono); font-size: 11.5px; line-height: 1.85; overflow: hidden; }
-  .term .tbar { display: flex; align-items: center; gap: 6px; padding: 9px 12px; border-bottom: 1px solid var(--line); color: var(--faint); }
-  .term .tbar .d { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
-  .term .tbar b { font-weight: 500; margin-left: 6px; }
-  .term .tbody { padding: 12px 13px; }
-  .term .c { color: var(--faint); } .term .am { color: var(--accent); } .term .g { color: var(--ink); } .term .hi { color: var(--accent-hi); }
-  .window .facts { display: flex; gap: 26px; margin-top: 20px; flex-wrap: wrap; }
+  .chartcard { background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 16px 16px 10px; }
+  .chartcard .chead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; gap: 10px; }
+  .chartcard .ct { font-weight: 650; font-size: .92rem; }
+  .chartcard .cn { font-family: var(--mono); font-size: 10.5px; color: var(--faint); letter-spacing: .04em; }
+  .chartcard svg { display: block; width: 100%; overflow: visible; }
+  .chartcard svg text { font-family: var(--mono); fill: var(--faint); }
+  .chartcard rect.bar { fill: var(--accent); transition: fill .15s; }
+  .chartcard rect.bar.hot { fill: var(--accent-hi); }
+  .gline { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 4; }
+  .window .facts { display: flex; gap: 24px; margin-top: 18px; flex-wrap: wrap; }
   .window .facts .k { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
   .window .facts .v { font-weight: 600; font-size: .92rem; margin-top: 3px; }
+  .window .hint { margin-top: 14px; font-family: var(--mono); font-size: 10.5px; color: var(--faint); letter-spacing: .05em; }
+
+  /* shared hover tooltip — value leads, label follows */
+  .ctip { position: fixed; z-index: 200; pointer-events: none; background: var(--panel); border: 1px solid var(--accent-dim); border-radius: 9px; padding: 8px 11px; font-family: var(--mono); font-size: 11.5px; line-height: 1.55; color: var(--muted); box-shadow: 0 14px 34px -14px rgba(0,0,0,.65); opacity: 0; transition: opacity .12s; white-space: nowrap; }
+  .ctip b { display: block; color: var(--ink); font-size: 13.5px; font-variant-numeric: tabular-nums; }
 
   /* tools strip */
-  .tools { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 26px 0; margin-top: 42px; }
+  .tools { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 24px 0; margin-top: 44px; }
   .tools .wrap { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
   .tools .lab { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
-  .tools .names { display: flex; gap: 26px; flex-wrap: wrap; color: var(--muted); font-weight: 600; font-size: .95rem; }
-  .tools .names span { position: relative; }
+  .tools .names { display: flex; gap: 24px; flex-wrap: wrap; color: var(--muted); font-weight: 600; font-size: .94rem; }
 
   /* sections */
-  section { padding: 84px 0; }
-  .shead { max-width: 62ch; margin-bottom: 44px; }
+  section { padding: 88px 0; }
+  .shead { max-width: 64ch; margin-bottom: 44px; }
   .shead h2 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); letter-spacing: -.02em; margin: 12px 0 12px; font-weight: 750; text-wrap: balance; }
   .shead p { color: var(--muted); margin: 0; font-size: 1.02rem; }
 
-  /* pipeline */
-  .pipe { font-family: var(--mono); font-size: 13px; color: var(--muted); background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 24px 26px; overflow-x: auto; line-height: 1.9; }
-  .pipe .am { color: var(--accent); } .pipe .g { color: var(--ink); }
+  /* architecture diagram */
+  .diagram { display: grid; grid-template-columns: 1fr 44px 1.06fr 44px 1fr; gap: 14px; align-items: center; }
+  .dcol { display: grid; gap: 10px; }
+  .dlabel { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .dnode { display: flex; align-items: center; gap: 11px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 11px 14px; font-size: .92rem; font-weight: 600; transition: border-color .2s, transform .2s, background .2s; }
+  .dnode svg { color: var(--accent); flex: none; }
+  .dnode small { display: block; font-weight: 400; color: var(--muted); font-size: .8rem; line-height: 1.35; }
+  .dnode:hover { border-color: var(--accent-dim); transform: translateX(3px); }
+  .dcore { background: var(--bg-2); border: 1.5px solid var(--accent-dim); border-radius: 16px; padding: 22px 20px; text-align: center; transition: border-color .25s, box-shadow .25s; }
+  .dcore:hover { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent); }
+  .dcore .fname { font-family: var(--mono); font-weight: 700; font-size: 1.06rem; color: var(--accent); }
+  .dcore p { color: var(--muted); font-size: .86rem; margin: 10px 0 0; line-height: 1.55; }
+  .dcore .fields { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .dcore .fields span { font-family: var(--mono); font-size: 10.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; }
+  .darrow { color: var(--accent-dim); display: grid; place-items: center; }
+  .dfoot { margin-top: 22px; font-size: .92rem; color: var(--muted); max-width: 74ch; }
+  .dfoot b { color: var(--ink); font-weight: 600; }
+
+  /* pipeline mode cards */
+  .modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .mode { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; transition: border-color .25s, transform .25s; position: relative; }
+  .mode:hover { border-color: var(--accent-dim); transform: translateY(-3px); }
+  .mode .num { position: absolute; top: 16px; right: 18px; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+  .mode svg { color: var(--accent); }
+  .mode .cmdname { font-family: var(--mono); font-size: 12.5px; color: var(--accent); margin: 12px 0 6px; }
+  .mode h4 { margin: 0 0 6px; font-size: 1.02rem; letter-spacing: -.01em; }
+  .mode p { color: var(--muted); font-size: .86rem; margin: 0; line-height: 1.55; }
+
+  /* sample section */
+  .sample { display: grid; grid-template-columns: 1.05fr .95fr; gap: 44px; align-items: center; }
+  .sample .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .scard { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; transition: border-color .25s; }
+  .scard:hover { border-color: var(--accent-dim); }
+  .scard .n { font-family: var(--mono); font-size: 1.7rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .scard .l { color: var(--muted); font-size: .86rem; margin-top: 2px; }
+  .slist { margin: 22px 0 26px; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .slist li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--muted); font-size: .95rem; }
+  .slist svg { color: var(--good); margin-top: 3px; }
+  .slist b { color: var(--ink); font-weight: 600; }
 
   /* install cards */
-  .install { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 18px; }
+  .install { display: grid; grid-template-columns: 1.15fr 1.15fr 1fr; gap: 18px; }
   .icard { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 24px; transition: border-color .25s, transform .25s; }
   .icard:hover { border-color: var(--accent-dim); transform: translateY(-3px); }
   .icard .tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
   .icard h4 { margin: 8px 0 4px; font-size: 1.1rem; letter-spacing: -.01em; }
   .icard p { color: var(--muted); font-size: .9rem; margin: 0 0 16px; }
-  .icard pre { margin: 0; font-family: var(--mono); font-size: 12.5px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: 13px 14px; overflow-x: auto; color: var(--ink); }
+  .icard pre { margin: 0; font-family: var(--mono); font-size: 12.5px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: 13px 14px; overflow-x: auto; color: var(--ink); line-height: 1.7; }
   .icard pre .c { color: var(--faint); }
 
-  /* value row */
+  /* trust */
   .vals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
   .val { border-top: 2px solid var(--accent-dim); padding-top: 18px; }
   .val h4 { margin: 0 0 8px; font-size: 1.05rem; letter-spacing: -.01em; }
-  .val p { color: var(--muted); margin: 0; font-size: .95rem; }
+  .val p { color: var(--muted); margin: 0; font-size: .94rem; }
+  .sec-strip { margin-top: 44px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .sec-strip span { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; transition: border-color .2s, color .2s; }
+  .sec-strip span:hover { border-color: var(--accent-dim); color: var(--ink); }
+  .sec-strip svg { color: var(--good); }
 
   /* cta */
   .cta { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 52px; text-align: center; box-shadow: var(--shadow); }
   .cta h2 { font-size: clamp(1.8rem, 3.6vw, 2.6rem); letter-spacing: -.025em; margin: 0 0 12px; font-weight: 780; text-wrap: balance; }
-  .cta p { color: var(--muted); margin: 0 auto 28px; max-width: 52ch; }
+  .cta p { color: var(--muted); margin: 0 auto 28px; max-width: 54ch; }
   .btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
   .btn { display: inline-flex; align-items: center; gap: 9px; font-weight: 600; font-size: .96rem; padding: 13px 22px; border-radius: 12px; border: 1px solid var(--line); transition: transform .14s, border-color .2s, background .2s; }
   .btn:active { transform: scale(.98); }
@@ -133,19 +181,26 @@
 
   footer { border-top: 1px solid var(--line); padding: 40px 0 64px; margin-top: 30px; }
   footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; color: var(--faint); font-size: .9rem; }
-  footer .mono { color: var(--muted); }
+  footer .links { display: flex; gap: 20px; flex-wrap: wrap; }
+  footer .links a { color: var(--muted); transition: color .2s; }
+  footer .links a:hover { color: var(--accent); }
 
   [data-reveal] { opacity: 0; transform: translateY(20px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
   [data-reveal].in { opacity: 1; transform: none; }
 
+  @media (max-width: 1020px) {
+    .modes { grid-template-columns: repeat(2, 1fr); }
+    .diagram { grid-template-columns: 1fr; }
+    .darrow { transform: rotate(90deg); justify-self: center; }
+  }
   @media (max-width: 900px) {
-    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .hero-grid, .sample { grid-template-columns: 1fr; gap: 40px; }
     .install { grid-template-columns: 1fr; }
     .vals { grid-template-columns: 1fr; gap: 26px; }
-    .nav .chip { display: none; }
-    .nav .badge { display: none; }
+    .nav a.link { display: none; }
     .cta { padding: 36px 24px; }
   }
+  @media (max-width: 560px) { .modes { grid-template-columns: 1fr; } .feats { grid-template-columns: 1fr; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; scroll-behavior: auto; } [data-reveal] { opacity: 1; transform: none; transition: none; } }
 </style>
 </head>
@@ -154,12 +209,13 @@
 
 <div class="topbar">
   <div class="wrap">
-    <div class="brand"><span class="logo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg></span>recall</div>
+    <div class="brand"><span class="logo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg></span>recall<span class="ver">v1.0</span></div>
     <nav class="nav">
-      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg>CLI &amp; Skill</span>
-      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4M15 3v4M4 8h16v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/></svg>MCP Ready</span>
-      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Private by design</span>
-      <a class="badge" href="https://github.com/premdevai/recall/blob/main/LICENSE">MIT License</a>
+      <a class="link" href="#how">How it works</a>
+      <a class="link" href="#pipeline">The pipeline</a>
+      <a class="link" href="#sample">Sample</a>
+      <a class="link" href="#install">Install</a>
+      <a class="link" href="https://github.com/premdevai/recall">GitHub</a>
       <button class="toggle" id="toggle" aria-label="Toggle theme">Light</button>
     </nav>
   </div>
@@ -168,14 +224,16 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">Engineering retrospective · Evidence backed</p>
+      <p class="eyebrow">Evidence-backed career records · v1.0</p>
       <h1>Turn your git history into interview-ready <span class="am">proof of impact.</span></h1>
-      <p class="lede">Reconstruct everything you've demonstrably <b>built</b> — from commits and PRs to metrics and tickets — into a polished HTML page or Markdown file. Automatic. Evidence-backed. <span class="am">Yours.</span></p>
+      <p class="lede">Recall reconstructs everything you've demonstrably <b>built</b> — commits, PRs, tickets, metrics — into one evidence model, then spends it on the whole job switch: <span class="am">brag doc, role fit, tailored applications, interview prep, exports.</span> Local-first. Yours.</p>
       <div class="feats">
-        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6M18 9a3 3 0 0 0 0-6 3 3 0 0 0 0 6zm0 0c0 6-12 3-12 9"/></svg><div><div class="t">Git-first</div><div class="d">Diffs, commits, PRs, authorship</div></div></div>
-        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="4" y2="12"/><line x1="10" y1="20" x2="10" y2="7"/><line x1="16" y1="20" x2="16" y2="10"/><line x1="22" y1="20" x2="22" y2="4"/></svg><div><div class="t">Real impact</div><div class="d">Metrics, incidents, deploys</div></div></div>
-        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9 16 14 18 21 12 17 6 21 8 14 2 9 9 9"/></svg><div><div class="t">Interview-ready</div><div class="d">STAR stories, skills, confidence</div></div></div>
-        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h6M9 17h6"/></svg><div><div class="t">One dataset</div><div class="d">HTML page or Markdown</div></div></div>
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6M18 9a3 3 0 0 0 0-6 3 3 0 0 0 0 6zm0 0c0 6-12 3-12 9"/></svg><div><div class="t">Git-first, token-frugal</div><div class="d">A digest script reads history; the model only judges</div></div></div>
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg><div><div class="t">A career, not one repo</div><div class="d">Store merges every repo &amp; employer, dedupes forks</div></div></div>
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/></svg><div><div class="t">Honest by construction</div><div class="d">Every claim cites evidence; self-reported is always marked</div></div></div>
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9 16 14 18 21 12 17 6 21 8 14 2 9 9 9"/></svg><div><div class="t">Application pipeline</div><div class="d">JD match → kit → tracker → interview → negotiation</div></div></div>
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h6M9 17h6"/></svg><div><div class="t">Every format</div><div class="d">HTML, Markdown, PDF, JSON Resume, LinkedIn</div></div></div>
+        <div class="feat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><div><div class="t">Private by design</div><div class="d">No servers, no telemetry, zero dependencies</div></div></div>
       </div>
       <div class="cmd">
         <span><span class="p">$</span> <span class="g">npx</span> <span class="am">@premdevai/recall</span></span>
@@ -184,27 +242,20 @@
     </div>
 
     <div class="window" data-reveal>
-      <div class="bar"><span class="d d1"></span><span class="d d2"></span><span class="d d3"></span><span class="fn">journey.html — self-contained</span></div>
+      <div class="bar"><span class="d d1"></span><span class="d d2"></span><span class="d d3"></span><span class="fn">journey.html — rendered by recall, self-contained</span></div>
       <div class="content">
-        <div class="brand"><span class="logo" style="width:26px;height:26px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg></span>recall</div>
-        <p class="eyebrow" style="margin-top:12px">Engineering retrospective</p>
-        <h3>Three years, one repo,<br><span class="am">2,347 commits</span> of evidence.</h3>
-        <div class="term">
-          <div class="tbar"><span class="d"></span><span class="d"></span><span class="d"></span><b>git log --author=you --stat</b></div>
-          <div class="tbody">
-            <div><span class="c">$</span> <span class="g">recall ./cobalt-web --author "maya"</span></div>
-            <div><span class="c">scanning 2,347 commits across 3 years…</span></div>
-            <div><span class="am">→</span> <span class="g">418 PRs merged · 1,204 reviews · 273 issues</span></div>
-            <div><span class="am">→</span> <span class="g">classified into </span><span class="hi">9 skill areas</span></div>
-            <div><span class="am">→</span> <span class="g">61 accomplishments · </span><span class="hi">confidence ≥ 40</span></div>
-            <div><span class="c"># from "fix typo" to production architecture</span></div>
-          </div>
+        <p class="eyebrow">Engineering retrospective · Maya Ellison</p>
+        <h3>Three years, one repo,<br><span class="am">2,734 commits</span> of evidence.</h3>
+        <div class="chartcard">
+          <div class="chead"><span class="ct">Shipping cadence</span><span class="cn">commits / month · last 12</span></div>
+          <div id="heroChart" data-vals="102,89,103,94,85,73,98,98,100,88,81,97" data-start="2025-07"></div>
         </div>
         <div class="facts">
-          <div><div class="k">Engineer</div><div class="v">Maya Ellison</div></div>
-          <div><div class="k">Repository</div><div class="v">cobalt / cobalt-web</div></div>
-          <div><div class="k">Tenure</div><div class="v mono" style="font-weight:600">Aug 2023 → Jul 2026</div></div>
+          <div><div class="k">Accomplishments</div><div class="v">9 · evidence-cited</div></div>
+          <div><div class="k">STAR stories</div><div class="v">6 rehearsal-ready</div></div>
+          <div><div class="k">Measured signals</div><div class="v">Datadog · CI · Jira</div></div>
         </div>
+        <div class="hint">↖ hover the bars — every mark carries its real month and count</div>
       </div>
     </div>
   </div>
@@ -212,8 +263,8 @@
 
 <div class="tools">
   <div class="wrap">
-    <span class="lab">Works with the tools you already use</span>
-    <div class="names"><span>GitHub</span><span>GitLab</span><span>Bitbucket</span><span>Jira</span><span>Linear</span><span>Datadog</span><span>CI/CD</span></div>
+    <span class="lab">Adapters for the tools you already use</span>
+    <div class="names"><span>GitHub</span><span>GitLab</span><span>Bitbucket</span><span>Jira</span><span>Linear</span><span>Datadog</span><span>Sentry</span><span>PagerDuty</span><span>CI/CD</span></div>
   </div>
 </div>
 
@@ -221,15 +272,80 @@
   <div class="wrap">
     <div class="shead" data-reveal>
       <p class="eyebrow">How it works</p>
-      <h2>One extraction. One dataset. Every format.</h2>
-      <p>Recall reads your history into a single evidence model, then renders it. Every source is just an adapter that maps onto that model — add one without touching the renderers.</p>
+      <h2>One evidence model. Everything else is an adapter or a renderer.</h2>
+      <p>Scripts do the mechanics — digesting history, merging careers, rendering pages — and the model does only judgment. Sources write <span class="mono">evidence.json</span>; renderers read it. Adding either side never touches the other.</p>
     </div>
-    <div class="pipe" data-reveal>  sources ────────────►  <span class="am">evidence.json</span>  ────────────►  renders
-  <span class="g">git</span> (always)                 │                        ├── journey.html   <span style="color:var(--faint)">(self-contained page)</span>
-  GitHub / GitLab / Bitbucket  │   one schema:          └── journey.md     <span style="color:var(--faint)">(paste-ready text)</span>
-  Jira / Linear                │   accomplishments +
-  Datadog / observability      │   evidence[] +
-  CI / CD                      │   metrics{} + skills</div>
+    <div class="diagram" data-reveal>
+      <div class="dcol">
+        <div class="dlabel">Sources — read only</div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6M18 9a3 3 0 0 0 0-6 3 3 0 0 0 0 6zm0 0c0 6-12 3-12 9"/></svg><div>git history<small>gather.js → 20 KB digest, zero tokens</small></div></div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 22v-3a4 4 0 0 0-1-3c3.5-.4 7-1.7 7-7.5a5.8 5.8 0 0 0-1.6-4A5.4 5.4 0 0 0 20.3 1S19-.3 16 1.7a15 15 0 0 0-8 0C5-.3 3.7 1 3.7 1a5.4 5.4 0 0 0-.1 3.5 5.8 5.8 0 0 0-1.6 4c0 5.8 3.5 7.1 7 7.5a4 4 0 0 0-1 3v3"/></svg><div>PRs &amp; reviews<small>GitHub · GitLab · Bitbucket</small></div></div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3v4M15 3v4M4 8h16v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/></svg><div>Tickets<small>Jira · Linear — batched queries</small></div></div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="20" x2="4" y2="12"/><line x1="10" y1="20" x2="10" y2="7"/><line x1="16" y1="20" x2="16" y2="10"/><line x1="22" y1="20" x2="22" y2="4"/></svg><div>Metrics &amp; incidents<small>Datadog · Sentry · PagerDuty · CI</small></div></div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM5 22v-5l-1-1a5 5 0 0 1 8-6M19 22v-5l1-1a5 5 0 0 0-8-6"/></svg><div>Told to Recall<small>talks, mentoring — marked self-reported</small></div></div>
+      </div>
+      <div class="darrow"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg></div>
+      <div class="dcore">
+        <div class="fname">evidence.json</div>
+        <p>One schema-validated contract per repo, merged into a career store that survives clones, dedupes forks, and can exclude or anonymize any employer. Plain JSON on your disk, chmod 600.</p>
+        <div class="fields"><span>accomplishments + citations</span><span>STAR stories</span><span>signals (measured)</span><span>skills, counted</span><span>enabled — impact through others</span><span>confidence 0–100</span></div>
+      </div>
+      <div class="darrow"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg></div>
+      <div class="dcol">
+        <div class="dlabel">Renders — pure code, zero tokens</div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="15" rx="2"/><path d="M8 21h8M12 18v3"/></svg><div>journey.html + .md<small>the interactive brag doc below</small></div></div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg><div>career.md<small>the cross-employer timeline</small></div></div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/></svg><div>PDF · JSON Resume · LinkedIn<small>export.js — offline, byte-honest</small></div></div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 21V5a2 2 0 0 1 2-2h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M9 13h6M9 17h3"/></svg><div>Application kits<small>apply.js — every claim citation-checked</small></div></div>
+        <div class="dnode"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg><div>Opt-in share<small>share.js — preview, confirm, never a default</small></div></div>
+      </div>
+    </div>
+    <p class="dfoot" data-reveal><b>Community adapters are one-file PRs.</b> The conformance kit (<span class="mono">conform.js</span>) validates any adapter's output against the schema — required fields, legal citation types, honesty rules — and lists every violation in one run.</p>
+  </div>
+</section>
+
+<section id="pipeline" style="padding-top:0">
+  <div class="wrap">
+    <div class="shead" data-reveal>
+      <p class="eyebrow">The job switch, end to end</p>
+      <h2>From "I should switch" to the offer — without leaving the terminal.</h2>
+      <p>Every mode runs on the same evidence model. Nothing is retyped, nothing is invented; if a job posting asks for something the record doesn't show, Recall says <i>gap</i> — never a bluff.</p>
+    </div>
+    <div class="modes">
+      <div class="mode" data-reveal><span class="num">01</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="15" rx="2"/><path d="M8 21h8M12 18v3"/></svg><div class="cmdname">/recall</div><h4>The record</h4><p>Digest → judgment → an interactive, self-contained page and its Markdown mirror. Filed into the career store automatically.</p></div>
+      <div class="mode" data-reveal><span class="num">02</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg><div class="cmdname">/recall roles</div><h4>Role fit</h4><p>Ranks the 3–5 roles the evidence actually supports today — each with proof to lead with and the one honest gap.</p></div>
+      <div class="mode" data-reveal><span class="num">03</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 21V5a2 2 0 0 1 2-2h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M9 13h6M9 17h3"/></svg><div class="cmdname">/recall apply &lt;posting&gt;</div><h4>The application kit</h4><p>Parses the JD once (cached by content hash), matches strong / partial / gap, and renders bullets, cover letter, and prep — every citation validated.</p></div>
+      <div class="mode" data-reveal><span class="num">04</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 4h18l-7 8v6l-4 2v-8z"/></svg><div class="cmdname">/recall status</div><h4>The funnel</h4><p>An append-only tracker: drafted → applied → screen → interview → offer. Illegal jumps rejected; history never rewritten.</p></div>
+      <div class="mode" data-reveal><span class="num">05</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div class="cmdname">/recall interview</div><h4>Rehearsal</h4><p>Asks the questions this posting will ask, critiques your answers against the record, and tightens the STAR wording until it lands.</p></div>
+      <div class="mode" data-reveal><span class="num">06</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><div class="cmdname">/recall negotiate</div><h4>The comp brief</h4><p>Scope, impact, leverage — built only from the highest-confidence measured evidence, every number traced to its source.</p></div>
+      <div class="mode" data-reveal><span class="num">07</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg><div class="cmdname">/recall since-last</div><h4>Always current</h4><p>A cron-safe refresh keeps evidence up to date for free; the delta render answers "what have I shipped since my last review".</p></div>
+      <div class="mode" data-reveal><span class="num">08</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg><div class="cmdname">/recall share</div><h4>Opt-in share</h4><p>Preview first — every email and link host in the page listed for review — then publish the exact reviewed bytes to an endpoint you choose.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="sample" style="padding-top:0">
+  <div class="wrap sample">
+    <div data-reveal>
+      <p class="eyebrow">The output</p>
+      <h2 style="font-size:clamp(1.7rem,3.2vw,2.4rem);letter-spacing:-.02em;margin:12px 0;font-weight:750">See a real render.</h2>
+      <p style="color:var(--muted);margin:0">Maya is a synthetic persona, but every pixel is the real renderer: live charts with per-mark tooltips, a contribution heatmap, counted skills with quarterly sparklines, measured signals, and six STAR stories — all from one <span class="mono">evidence.json</span>.</p>
+      <ul class="slist">
+        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>Every chart is data, not decoration</b> — hover any bar, cell, or sparkline for its exact month, day, or quarter and count.</span></li>
+        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>Signals are measured, never invented</b> — LCP from Datadog, build time from CI, throughput from Jira.</span></li>
+        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>Honesty is visible</b> — Maya's conference talk is on the page, and it's marked <i>self-reported</i> everywhere it appears.</span></li>
+      </ul>
+      <div class="btns" style="justify-content:flex-start">
+        <a class="btn primary" href="./examples/journey.html">Open the sample record</a>
+        <a class="btn" href="https://github.com/premdevai/recall/blob/main/examples/journey.md">Markdown mirror</a>
+      </div>
+    </div>
+    <div class="stats" data-reveal>
+      <div class="scard"><div class="n">2,734</div><div class="l">commits digested — one script pass, zero model tokens</div></div>
+      <div class="scard"><div class="n">9</div><div class="l">accomplishments, all citing PRs, tickets, or metrics</div></div>
+      <div class="scard"><div class="n">3</div><div class="l">measured signals: 5.2s→2.1s LCP · 14m→4m builds · 214 tickets</div></div>
+      <div class="scard"><div class="n">1</div><div class="l">self-reported item — marked, never counted as verified</div></div>
+    </div>
   </div>
 </section>
 
@@ -237,14 +353,14 @@
   <div class="wrap">
     <div class="shead" data-reveal>
       <p class="eyebrow">Install</p>
-      <h2>Two commands, zero config.</h2>
-      <p>No API keys, nothing to build. Recall runs as a Claude Code skill and reuses the git and MCP connections you already have.</p>
+      <h2>One command, zero config, zero dependencies.</h2>
+      <p>Recall runs as a Claude Code skill and reuses the git and MCP connections you already have. No API keys, no accounts, nothing to build.</p>
     </div>
     <div class="install">
       <div class="icard" data-reveal>
         <div class="tag">Recommended</div>
         <h4>npx</h4>
-        <p>Installs the skill in one command, then ask Claude <span class="mono">/recall</span>.</p>
+        <p>Installs the skill and its scripts, then ask Claude <span class="mono">/recall</span>.</p>
         <pre><span class="c"># installs to ~/.claude/skills</span>
 npx @premdevai/recall
 
@@ -252,21 +368,21 @@ npx @premdevai/recall
 /recall</pre>
       </div>
       <div class="icard" data-reveal>
-        <div class="tag">No Node</div>
-        <h4>Copy the skill</h4>
-        <p>Drop the single skill file into your Claude Code skills directory.</p>
-        <pre>curl -fsSL \
- .../skill/SKILL.md \
- -o ~/.claude/skills/\
-recall/SKILL.md</pre>
+        <div class="tag">Plugin marketplace</div>
+        <h4>Claude Code plugin</h4>
+        <p>Install straight from the repo's marketplace manifest.</p>
+        <pre>claude plugin marketplace add \
+  premdevai/recall
+claude plugin install recall</pre>
       </div>
       <div class="icard" data-reveal>
-        <div class="tag">CI · git-only</div>
-        <h4>Standalone CLI</h4>
-        <p>For pipelines or use outside Claude Code. Outputs Markdown.</p>
-        <pre>pip install anthropic
-python recall.py . \
-  --author "you@ex.com"</pre>
+        <div class="tag">Always current</div>
+        <h4>Scheduled refresh</h4>
+        <p>Cron keeps the evidence fresh — no model, no tokens.</p>
+        <pre><span class="c"># weekly, pure script</span>
+0 9 * * 1 cd ~/repo &amp;&amp; \
+ node ~/.claude/skills/\
+recall/refresh.js</pre>
       </div>
     </div>
   </div>
@@ -279,9 +395,17 @@ python recall.py . \
       <h2>Proof, not a self-rating.</h2>
     </div>
     <div class="vals">
-      <div class="val" data-reveal><h4>Evidence or it didn't happen</h4><p>Every claim links back to a commit, PR, ticket, or metric. Skill depth is real merged-PR and commit counts — never a made-up 0–100 score.</p></div>
-      <div class="val" data-reveal><h4>Confidence, scored</h4><p>Each contribution is ranked on how résumé-worthy it is. A formatting change lands near 2; a shipped feature with measured impact near 95. The trivia stays off the page.</p></div>
-      <div class="val" data-reveal><h4>Private by design</h4><p>Runs entirely locally. Reads only what's on your machine or in the tools you've connected, and sends nothing anywhere except the model call you initiate. No servers, no telemetry.</p></div>
+      <div class="val" data-reveal><h4>Evidence or it didn't happen</h4><p>Every claim links to a commit, PR, ticket, or metric. Skill depth is real merged-PR and commit counts — never a made-up 0–100 score. Requirements without adjacent evidence are called gaps, not stretched.</p></div>
+      <div class="val" data-reveal><h4>Honesty is structural</h4><p>Self-reported work is marked in every format and never counted as verified — the renderer, the career store, the exporters, and the application kit all enforce it independently of anyone's good intentions.</p></div>
+      <div class="val" data-reveal><h4>Private by design</h4><p>Local-first: plain JSON on your disk, chmod 600, no sync. The only outbound write in the entire codebase is the opt-in share — and it never fires without a previewed, explicit confirm.</p></div>
+    </div>
+    <div class="sec-strip" data-reveal>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>zero runtime dependencies</span>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>PII leak gate in CI</span>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>store is chmod 600, never synced</span>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>one opt-in egress point</span>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>npm provenance on every release</span>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>84 adversarial tests</span>
     </div>
   </div>
 </section>
@@ -294,7 +418,7 @@ python recall.py . \
       <div class="btns">
         <a class="btn primary" href="https://www.npmjs.com/package/@premdevai/recall">Install from npm</a>
         <a class="btn" href="https://github.com/premdevai/recall">View on GitHub</a>
-        <a class="btn" href="./examples/journey.html">See a live sample</a>
+        <a class="btn" href="./examples/journey.html">See the sample</a>
       </div>
     </div>
   </div>
@@ -302,8 +426,14 @@ python recall.py . \
 
 <footer>
   <div class="wrap">
-    <div class="brand" style="font-size:1rem"><span class="logo" style="width:26px;height:26px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg></span>recall</div>
-    <div>MIT licensed · <a class="mono" href="https://github.com/premdevai/recall">github.com/premdevai/recall</a></div>
+    <div class="brand" style="font-size:1rem"><span class="logo" style="width:26px;height:26px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="12" y1="17" x2="20" y2="17"/></svg></span>recall <span class="ver">v1.0</span></div>
+    <div class="links">
+      <a href="./examples/journey.html">Sample</a>
+      <a href="https://github.com/premdevai/recall/blob/main/SECURITY.md">Security</a>
+      <a href="https://github.com/premdevai/recall/blob/main/ADAPTERS.md">Write an adapter</a>
+      <a href="https://github.com/premdevai/recall/blob/main/ROADMAP.md">Roadmap</a>
+      <a href="https://github.com/premdevai/recall/blob/main/LICENSE">MIT</a>
+    </div>
   </div>
 </footer>
 
@@ -322,6 +452,46 @@ python recall.py . \
 
   var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .15 });
   document.querySelectorAll('[data-reveal]').forEach(function(el){ io.observe(el); });
+
+  // ── hero chart: real per-mark tooltips, same interaction spec as the product ──
+  var tip = document.createElement('div'); tip.className = 'ctip'; tip.setAttribute('aria-hidden','true'); document.body.appendChild(tip);
+  function tipMove(e){ var pad=14, x=e.clientX+pad, y=e.clientY+pad, r=tip.getBoundingClientRect();
+    if(x+r.width>innerWidth-8) x=e.clientX-r.width-pad; if(y+r.height>innerHeight-8) y=e.clientY-r.height-pad;
+    tip.style.left=x+'px'; tip.style.top=y+'px'; }
+  function tipShow(value,label,e){ tip.textContent=''; var b=document.createElement('b'); b.textContent=value; tip.appendChild(b); tip.appendChild(document.createTextNode(label)); tip.style.opacity=1; tipMove(e); }
+  function tipHide(){ tip.style.opacity=0; }
+
+  (function(){
+    var el = document.getElementById('heroChart'); if(!el) return;
+    var vals = el.getAttribute('data-vals').split(',').map(Number);
+    var m0 = el.getAttribute('data-start').split('-').map(Number);
+    var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    function monthOf(i){ var y = m0[0] + Math.floor((m0[1]-1+i)/12), m = (m0[1]-1+i)%12; return MONTHS[m]+' '+y; }
+    function shortOf(i){ var y = m0[0] + Math.floor((m0[1]-1+i)/12), m = (m0[1]-1+i)%12; return MONTHS[m].slice(0,3)+(m===0||i===0?' ’'+String(y).slice(2):''); }
+    var NS = 'http://www.w3.org/2000/svg';
+    function mk(t,a){ var e=document.createElementNS(NS,t); for(var k in a) e.setAttribute(k,a[k]); return e; }
+    var W=520, H=180, padL=30, padT=8, padB=22, gap=6, n=vals.length;
+    var bw=(W-padL-gap*(n-1))/n, max=Math.max.apply(null,vals), plot=H-padB-padT;
+    var svg=mk('svg',{viewBox:'0 0 '+W+' '+H, role:'img', 'aria-label':'Commits per month, last 12 months'});
+    [max, Math.round(max/2)].forEach(function(gv){
+      var gy=H-padB-(gv/max)*plot;
+      svg.appendChild(mk('line',{x1:padL,y1:gy.toFixed(1),x2:W,y2:gy.toFixed(1),'class':'gline'}));
+      var gt=mk('text',{x:padL-7,y:(gy+3).toFixed(1),'text-anchor':'end','font-size':'9'}); gt.textContent=gv; svg.appendChild(gt);
+    });
+    svg.appendChild(mk('line',{x1:padL,y1:H-padB,x2:W,y2:H-padB,stroke:'var(--line)','stroke-width':1}));
+    vals.forEach(function(v,i){
+      var bh=Math.max(3,(v/max)*plot), x=padL+i*(bw+gap), y=H-padB-bh;
+      var bar=mk('rect',{x:x.toFixed(1),y:y.toFixed(1),width:bw.toFixed(1),height:bh.toFixed(1),rx:3,'class':'bar'});
+      svg.appendChild(bar);
+      var hit=mk('rect',{x:(x-gap/2).toFixed(1),y:padT,width:(bw+gap).toFixed(1),height:plot,fill:'transparent'});
+      hit.addEventListener('pointerenter',function(e){ tipShow(v+' commits', monthOf(i), e); bar.classList.add('hot'); });
+      hit.addEventListener('pointermove',tipMove);
+      hit.addEventListener('pointerleave',function(){ tipHide(); bar.classList.remove('hot'); });
+      svg.appendChild(hit);
+      if(i%2===0){ var tx=mk('text',{x:(x+bw/2).toFixed(1),y:H-7,'text-anchor':'middle','font-size':'8.5'}); tx.textContent=shortOf(i); svg.appendChild(tx); }
+    });
+    el.appendChild(svg);
+  })();
 </script>
 </body>
 </html>

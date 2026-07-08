@@ -184,11 +184,15 @@ const rel = (iso) => { // "3 mo ago" — presentation only
 const skillSrc = skills.length ? skills : (dg ? Object.entries(dg.charts.areas).slice(0, 8).map(([a, n]) => ({
   name: a, commits: n, activity: { values: dg.charts.area_quarterly.series[a] || [] },
 })) : []);
+const qLabels = dg ? dg.charts.area_quarterly.labels.join(",") : "";
 const skillRows = skillSrc.map((s) => {
   const spark = (s.activity && s.activity.values || []).join(",");
+  // quarter labels power the sparkline tooltips; digest quarters fit any
+  // digest-length trace, model-provided shorter traces fall back in the template
+  const sparkLabels = (s.activity && s.activity.values && dg && s.activity.values.length === dg.charts.area_quarterly.labels.length) ? qLabels : "";
   const ago = s.lastTouched && rel(s.lastTouched);
   const last = ago ? mLabel(s.lastTouched) : esc(s.lastTouched || "");
-  return `<div class="prow" data-reveal><div class="sk">${esc(s.name)}<small>${esc(s.subtitle || "")}</small></div><div class="metric pralign-r">${s.prs != null ? s.prs : "—"}</div><div class="metric pralign-r">${s.commits != null ? s.commits : "—"}</div><div class="spark" data-spark="${spark}"></div><div class="last">${last}<i>${ago || ""}</i></div></div>`;
+  return `<div class="prow" data-reveal><div class="sk">${esc(s.name)}<small>${esc(s.subtitle || "")}</small></div><div class="metric pralign-r">${s.prs != null ? s.prs : "—"}</div><div class="metric pralign-r">${s.commits != null ? s.commits : "—"}</div><div class="spark" data-spark="${spark}" data-spark-labels="${esc(sparkLabels)}"></div><div class="last">${last}<i>${ago || ""}</i></div></div>`;
 });
 
 const accent = (t) => { const w = t.trim().split(" "); const lastTwo = w.splice(-Math.min(2, w.length)).join(" "); return (w.length ? esc(w.join(" ")) + " " : "") + "<b>" + esc(lastTwo) + "</b>"; };
@@ -232,6 +236,7 @@ const vars = {
   MONTHS: dg ? dg.charts.monthly.values.length : "",
   CSV_MONTHLY_COUNTS: dg ? dg.charts.monthly.values.join(",") : "",
   CSV_MONTH_LABELS: dg ? dg.charts.monthly.labels.join(",") : "",
+  MONTH_START: dg ? dg.range.from.slice(0, 7) : "",
   CSV_DAILY_COUNTS: dg ? dg.charts.heatmap.values.join(",") : "",
   FIRST_MONDAY_ISO: dg ? dg.charts.heatmap.start : "",
   HBARS: hb.map(([a, n]) => a + ":" + n).join(","),

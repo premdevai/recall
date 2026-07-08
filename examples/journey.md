@@ -1,144 +1,143 @@
-# Maya Ellison — Three Years in `cobalt-web`
+# Maya Ellison — Engineering Record (cobalt/cobalt-web)
 
-> Everything demonstrably shipped in **cobalt-web**, read straight from the history — not from
-> memory. One page to walk into the next interview with clarity, the confidence of receipts,
-> and proof behind every line.
-
-| | |
-|---|---|
-| **Engineer** | Maya Ellison |
-| **Repository** | cobalt / cobalt-web |
-| **Tenure** | Aug 2023 → Jul 2026 |
-| **Reconstructed from** | 2,347 commits · 418 PRs · 1,204 review threads |
-
----
+> 2.9 years, 2,734 commits of evidence · sources: git, github, jira, datadog, ci · confidence ≥ 40
 
 ## The paper trail, counted
 
-| Metric | Value | |
-|---|--:|---|
-| Commits authored | **2,347** | ≈ 2.1 / working day, sustained 3 yrs |
-| Pull requests merged | **418** | |
-| Issues closed | **273** | |
-| Review comments left | **1,204** | mentoring signal |
-| Lines added / removed | **214k / 138k** | |
-| Releases shipped | **39** | |
+| Signal | Count |
+|---|---|
+| Commits authored | **2,734** |
+| Pull requests merged | **418** |
+| Issues closed | **273** |
+| Review comments | **1,204** |
+| Releases shipped | **39** |
+| Lines added / removed | **252,348 / 160,486** |
 
----
+Commits per month: `▄▄▅▄▄▅▆▅▅▇▆▇▇▇▇▇▅▆▇▅█▇▆█▇█▇▇▆███▇▇█▁` (36 months)
 
-## Depth you can defend in the room
+## Measured impact
 
-No self-rated bars. Each competency is backed by the merged PRs and commits behind it, plus a
-three-year activity trace (`▁`–`█`, one block per quarter, Q3 ’23 → Q2 ’26). When they ask
-"how deep?", the answer is a number, not a feeling.
+- **Dashboard LCP · p75** (Datadog): 5.2s → 2.1s — after the virtualization rework
+- **Frontend build time** (CI): 14m 20s → 4m 05s — remote cache + dependency pruning
+- **Tickets delivered** (Jira): 214 — across 11 epics · 3 years
 
-| Competency | Merged PRs | Commits | Activity | Last touched |
-|---|--:|--:|---|---|
-| **React** — components · hooks · context | 141 | 812 | `▂▃▄▅▆▆▇▇██▇█` | 3 days ago |
-| **TypeScript** — generics · utility types · inference | 118 | 640 | `▁▂▃▄▅▆▆▇▇██▇` | 3 days ago |
-| **Performance** — virtualization · bundle budgets | 34 | 190 | `▁▁▁▃▆█▆▄▃▂▃▂` | Apr ’26 |
-| **Testing** — Playwright · Jest · MSW | 47 | 210 | `▁▁▂▃▅▇█▆▄▃▄▃` | May ’26 |
-| **Node / API** — REST · pagination · caching | 52 | 240 | `▄▄▄▅▅▆▅▆▅▆▅▆` | Jun ’26 |
-| **Architecture** — module boundaries · design tokens | 22 | 130 | `▁▁▁▂▂▃▄▅▆██▇` | 2 wk ago |
-| **Accessibility** — ARIA · focus management | 29 | 96 | `▂▂▂▃▃▄▄▃▄▃▄▃` | Mar ’26 |
-| **CI / CD** — pipelines · preview envs | 18 | 88 | `▁▂▃▄▃▅▆▄▃▄▃▂` | Feb ’26 |
-| **GraphQL** — schema design · normalized cache | 16 | 72 | `▃▅▆▇▅▄▃▂▂▁▁▁` | Nov ’25 |
+## Enabled — impact through others
 
----
+611 PRs reviewed · 1204 review comments · 388 approvals — counted separately from authored work.
+- Primary reviewer for the payments surface (214 reviews)
+- Unblocked the mobile team's design-system adoption — 9 pairing sessions, 3 migration PRs reviewed end-to-end
 
-## The arc your history already tells
+## Skills, counted
 
-Three phases the log makes obvious — with the full commit-by-commit record at the end.
+| Competency | PRs | Commits | Activity | Last touched |
+|---|---|---|---|---|
+| **React** <br><sub>components · hooks · suspense</sub> | 141 | 701 | `▃▅▅▆▇▇█▇███▅▂` | 2026-06-28 |
+| **API design** <br><sub>REST · pagination · versioning</sub> | 86 | 538 | `▂▄▅▆▆▇▇▇███▅▂` | 2026-06-30 |
+| **State & data flow** <br><sub>query cache · optimistic UI</sub> | 54 | 373 | `▂▄▅▆▇▇▇▇███▅▂` | 2026-05-19 |
+| **Performance** <br><sub>virtualization · bundle budgets</sub> | 34 | 368 | `▁▂▃▆██▇▄▃▃▂▂▁` | 2026-04-15 |
+| **Design system** <br><sub>tokens · a11y · theming</sub> | 41 | 346 | `▁▂▂▂▃▃▄▇███▅▂` | 2026-06-12 |
+| **Testing** <br><sub>vitest · playwright · contract tests</sub> | 38 | 233 | `▂▄▅▆▆▇▇▇██▇▆▂` | 2026-06-25 |
+| **Infra & CI** <br><sub>pipelines · caching · previews</sub> | 16 | 98 | `▂▃▄▅▆▇█▇▆▇▆▃▂` | 2026-03-02 |
+| **Docs & enablement** <br><sub>runbooks · ADRs · onboarding</sub> | 8 | 77 | `▃▄▅▆▆▇▇▆▇█▇▄▂` | 2026-05-30 |
 
-### Act I · Aug 2023 – Jun 2024 — Learning the terrain
-First 300 commits are small and cautious — bug fixes, copy tweaks, a nervous first PR. By spring
-the pattern flips: whole features land, reviewers stop leaving change requests.
+## The journey
 
-- **React** — *Reusable component library*: extracted 40+ shared primitives from copy-pasted UI.
-- **Auth** — *Login & token-refresh flow*: first end-to-end feature owned solo; protected routes, silent refresh.
+### Learning the terrain · Aug 2023 → Jun 2024
 
-### Act II · Jul 2024 – Aug 2025 — Taking ownership
-Commits get bigger and more surgical. Maya stops fixing symptoms and starts fixing systems.
+Small, safe, everywhere — hundreds of commits across every corner of the app while the mental map forms.
 
-- **Performance** — *Dashboard virtualization*: cut a 5,000-row table from 5.2s to 2.1s first paint.
-- **Architecture** — *Design system "Loom"*: tokenized components adopted across 6 product modules.
-- **Testing** — *Playwright migration*: replaced flaky Cypress; CI failures 18% → 3%.
-- **API** — *Optimistic mutations*: cursor pagination + optimistic updates across the data layer.
+- **[Testing] Deleted flakiness from the merge queue** — Stabilized the merge queue: quarantined and fixed 41 flaky tests, retry rate 18% → 1.2%. _(#1013, 6d0f5b2, ci.retry.rate)_
+- **[Docs & enablement] Wrote the onboarding path new hires actually finish** — Authored the frontend onboarding runbook — new-hire first-PR time dropped from 3 weeks to 4 days. _(#901, 23c81aa)_
 
-### Act III · Sep 2025 – Jul 2026 — Multiplying through others
-The review-comment count overtakes the commit count. Fingerprints move from files to decisions.
+### Taking ownership · Jul 2024 → Aug 2025
 
-- **Architecture** — *Feature-flag platform*: progressive delivery decoupling release from deploy.
-- **Migration** — *React 18 → 19 rollout*: led a 90-PR incremental upgrade with zero incidents.
-- **Reliability** — *Incident command*: owned two Sev-2 responses; wrote the postmortems and the fixes.
-- **Mentoring** — *1,204 review threads*: reviewed more code than most engineers wrote.
+Commits get bigger and more surgical — Maya stops fixing symptoms and starts fixing systems.
 
-<details>
-<summary><b>Open the full commit-by-commit timeline</b> — 61 milestones · 2,347 commits</summary>
+- **[Performance] Made a 5,000-row dashboard feel instant** — Cut dashboard first-paint 60% (5.2s → 2.1s) by introducing row virtualization and render memoization. _(#1284, a3f9e1c, COB-4471)_
+- **[API design] Versioned the public API and killed the N+1 pagination** — Shipped API /v2 (cursor pagination, zero breaking changes) — p99 list latency 8.4s → 410ms. _(#1412, 7cd20b4, COB-4106)_
+- **[State & data flow] Rebuilt data flow around an optimistic query cache** — Made every interaction feel instant (<50ms feedback) with an optimistic query cache; −78% refetch traffic. _(#1688, b52ee19, COB-3988)_
 
-| Date | Area | Milestone | PR |
-|---|---|---|---|
-| 2023 · Aug | Onboarding | First merged PR — fixed pagination off-by-one on the accounts table | #0037 |
-| 2023 · Oct | React | Extracted the first shared primitives from copy-pasted UI | #0192 |
-| 2024 · Jan | Auth | Owned login + silent token-refresh flow end to end | #0388 |
-| 2024 · Apr | Accessibility | Keyboard navigation and focus traps across all modals | #0541 |
-| 2024 · Jul | Performance | Dashboard virtualization — 5.2s to 2.1s first paint | #1284 |
-| 2024 · Sep | Testing | Migrated the suite off flaky Cypress to Playwright | #1502 |
-| 2024 · Dec | Architecture | Shipped the "Loom" design system + migration codemod | #0892 |
-| 2025 · Mar | API | Cursor pagination + optimistic mutations in the data layer | #1740 |
-| 2025 · Jun | CI / CD | Per-PR preview environments and a bundle-budget gate | #1888 |
-| 2025 · Sep | Architecture | Feature-flag platform decoupling release from deploy | #1961 |
-| 2025 · Nov | Migration | Kicked off the incremental React 18 → 19 rollout | #2033 |
-| 2026 · Feb | Reliability | Incident command on Sev-2; wrote the postmortem and the fix | #2210 |
-| 2026 · Apr | Performance | Hydration pass — cut time-to-interactive another 22% | #2298 |
-| 2026 · Jun | Mentoring | Crossed 1,200 review threads; authored the review playbook | #2341 |
+### Systems and scale · Sep 2025 → Jul 2026
 
-</details>
+The work turns multiplicative: platform pieces, review leverage, and the paths other engineers build on.
 
----
+- **[Infra & CI] Took the frontend build from 14 minutes to 4** — Cut CI build time 71% (14m → 4m) with remote caching and change-scoped test splitting; −62% CI spend. _(#1955, e11d9a0, ci.build.p50)_
+- **[Design system] Built the token pipeline that ended per-page theming** — Designed the 212-token theming pipeline that turned a 6-week brand refresh into a 4-day data change. _(#2103, 90ab77e, COB-5210)_
+- **[Design system] Closed the accessibility audit — 94 findings to zero** — Closed a 94-finding accessibility audit to zero and gated CI so it stays there (23 regressions blocked since). _(#2299, 4f60c2d, COB-5391)_
+- **[Docs & enablement] Spoke at a regional React meetup on the virtualization rework** _(self-reported)_ — Presented the dashboard-virtualization case study to ~200 engineers at a regional React meetup. _(told to recall 2026-07-06)_
 
-## Interview-ready, evidence-backed
+## Interview-ready STAR stories
 
-### Made a 5,000-row dashboard feel instant — *Performance* · confidence 97
-> Evidence: **PR #1284** · 14 commits · `a3f9e1…` · deploy v4.2
+### Made a 5,000-row dashboard feel instant · confidence 97
 
-- **Situation** — The ledger dashboard locked up rendering 5,000+ rows; support tickets called it "frozen."
+- **Situation** — The ledger dashboard locked up rendering 5,000+ rows; support tickets called it "frozen".
 - **Task** — Restore responsiveness without changing behavior or breaking the export path.
-- **Action** — Row virtualization, memoized cells, code-split charts, lazy-loaded the export module.
-- **Result** — First paint **5.2s → 2.1s**, **40%** fewer renders, Lighthouse **61 → 94**.
+- **Action** — Introduced row virtualization, memoized the expensive cells, code-split the charts, and lazy-loaded the export module.
+- **Result** — First paint p75 5.2s → 2.1s, 40% fewer renders, Lighthouse 61 → 94.
+- **Evidence** — pr #1284 · commit a3f9e1c · ticket COB-4471 · metric dashboard.lcp.p75 (5.2s → 2.1s (Datadog RUM)) · deploy v4.2.0
 
-### Built the design system six teams now build on — *Architecture · React* · confidence 94
-> Evidence: **PR #892** · 63 commits · RFC-014 · 6 modules
+### Versioned the public API and killed the N+1 pagination · confidence 94
 
-- **Situation** — Every squad reinvented buttons and modals; the UI drifted and a11y regressed weekly.
-- **Task** — Create one source of truth without stalling product delivery mid-flight.
-- **Action** — Shipped "Loom": tokenized primitives, headless hooks, docs, and a migration codemod.
-- **Result** — Adopted by **6** modules, **−31%** UI code, a11y violations **down 78%**.
+- **Situation** — Offset pagination collapsed above 100k records and blocked two enterprise deals.
+- **Task** — Ship /v2 with cursor pagination — zero breaking changes for 240 existing integrations.
+- **Action** — Designed the cursor contract, dual-served /v1 and /v2 behind a compatibility layer, added contract tests for every documented consumer path.
+- **Result** — p99 list latency 8.4s → 410ms on 100k-row accounts; zero breaking-change tickets filed post-launch.
+- **Evidence** — pr #1412 · commit 7cd20b4 · ticket COB-4106 · metric api.list.p99 (8.4s → 410ms (Datadog APM))
 
-### Led the React 19 upgrade with zero incidents — *Migration · Reliability* · confidence 91
-> Evidence: **PR #2033** · 90 PRs · feature-flagged
+### Took the frontend build from 14 minutes to 4 · confidence 92
 
-- **Situation** — The app was two majors behind; concurrent-mode bugs blocked new hires' features.
-- **Task** — Upgrade a live, high-traffic app without a maintenance window.
-- **Action** — Sequenced a 90-PR incremental rollout behind flags, wrote codemods, gated on real-user metrics.
-- **Result** — **0** customer incidents, **−22%** hydration time, unblocked **7** stalled features.
+- **Situation** — Every PR waited 14+ minutes for CI; engineers batched changes to avoid the queue, making reviews bigger and riskier.
+- **Task** — Get the feedback loop under 5 minutes without buying more runners.
+- **Action** — Introduced remote build caching, pruned 31 phantom dependencies, split the test matrix by change surface, and added preview deploys off the cache.
+- **Result** — Build p50 14m20s → 4m05s, 89% cache hit rate, CI spend down 62%.
+- **Evidence** — pr #1955 · commit e11d9a0 · metric ci.build.p50 (14m20s → 4m05s (CI analytics))
+
+### Built the token pipeline that ended per-page theming · confidence 90
+
+- **Situation** — Four products themed themselves with copy-pasted CSS; a brand refresh was quoted at six weeks of manual edits.
+- **Task** — Make theming a data change, not a code change.
+- **Action** — Extracted 212 design tokens, generated platform outputs (CSS variables, TS constants) from one source, migrated 61 components, and wired a11y contrast checks into CI.
+- **Result** — The brand refresh shipped in 4 days; contrast violations in CI dropped to zero.
+- **Evidence** — pr #2103 · commit 90ab77e · ticket COB-5210
+
+### Closed the accessibility audit — 94 findings to zero · confidence 89
+
+- **Situation** — An enterprise prospect's accessibility audit returned 94 findings and a hard deadline in the contract.
+- **Task** — Reach zero open findings before the renewal date, and stay there.
+- **Action** — Fixed focus order and ARIA semantics across 40+ components, added keyboard paths to every interactive element, and made axe checks a merge gate.
+- **Result** — Zero open findings at renewal; the axe gate has blocked 23 regressions since.
+- **Evidence** — pr #2299 · commit 4f60c2d · ticket COB-5391
+
+### Rebuilt data flow around an optimistic query cache · confidence 88
+
+- **Situation** — Every mutation refetched whole collections; the app felt like a page reload on every click.
+- **Task** — Make interactions instant while keeping the server as the source of truth.
+- **Action** — Introduced a normalized query cache with optimistic updates and rollback, plus a mutation queue for flaky connections.
+- **Result** — Interaction-to-feedback under 50ms across the app; refetch traffic down 78%.
+- **Evidence** — pr #1688 · commit b52ee19 · ticket COB-3988
+
+## Résumé bullets
+
+- Cut dashboard first-paint 60% (5.2s → 2.1s) by introducing row virtualization and render memoization.
+- Shipped API /v2 (cursor pagination, zero breaking changes) — p99 list latency 8.4s → 410ms.
+- Cut CI build time 71% (14m → 4m) with remote caching and change-scoped test splitting; −62% CI spend.
+- Designed the 212-token theming pipeline that turned a 6-week brand refresh into a 4-day data change.
+- Closed a 94-finding accessibility audit to zero and gated CI so it stays there (23 regressions blocked since).
+- Made every interaction feel instant (<50ms feedback) with an optimistic query cache; −78% refetch traffic.
+- Stabilized the merge queue: quarantined and fixed 41 flaky tests, retry rate 18% → 1.2%.
+- Authored the frontend onboarding runbook — new-hire first-PR time dropped from 3 weeks to 4 days.
+- Presented the dashboard-virtualization case study to ~200 engineers at a regional React meetup. _(self-reported)_
+
+## The long tail
+
+**Performance** — List virtualization · Route-level code splitting · Image & font optimization · Memoized render paths · Bundle budgets in CI
+
+**API & data** — Cursor pagination · API versioning · Normalized query cache · Optimistic updates with rollback · Contract tests
+
+**Platform** — Design tokens pipeline · Remote build caching · Preview deploys · axe merge gate · Merge-queue stabilization
+
+**Collaboration** — 1,204 review comments · Onboarding runbook · ADR practice · Incident write-ups
+
 
 ---
-
-## Nothing forgotten, all of it filed
-
-The full inventory recovered from three years of work — phrased so each line drops straight into a
-résumé bullet or the answer to "tell me about a time you…".
-
-- **Performance** — list virtualization · route-level code splitting · image & font optimization · memoized render paths
-- **React** — headless component hooks · context-driven theming · Suspense data boundaries · form state primitives
-- **TypeScript** — generic API client · discriminated unions · type-safe routing · utility-type helpers
-- **Testing** — Playwright e2e suite · visual regression gates · MSW request mocking · flake quarantine
-- **API & Data** — cursor pagination · optimistic mutations · retry & backoff layer · normalized cache
-- **Architecture** — module boundaries · feature-flag platform · monorepo tooling · design tokens
-- **Accessibility** — keyboard navigation · ARIA live regions · focus management · reduced-motion paths
-- **Delivery** — preview environments · release automation · bundle-budget CI · incident runbooks
-
----
-
-<sub>Generated by **Recall** — `recall ./cobalt-web --author "maya" --format md`. Every claim links back to a diff.</sub>
+<sub>Generated by Recall — every claim links to a commit, PR, ticket, or metric. Generated 2026-07-08 from git, github, jira, datadog, ci. Self-reported items are marked.</sub>
