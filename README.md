@@ -76,6 +76,26 @@ Then, in any repository, ask Claude Code:
 Recall scopes the run, reads your history, pulls from whichever MCP sources you have connected,
 and renders the page or Markdown.
 
+### Job hunting? The whole pipeline runs on the same evidence
+
+| Command | Gives you |
+|---|---|
+| `/recall roles` | The 3–5 roles your record actually supports — with proof, gaps, and job-board search strings |
+| `/recall apply <job posting>` | Résumé bullets reordered for that posting, cover-letter paragraphs, likely interview questions each paired with your STAR story, and an honest fit summary |
+| `/recall bullets` | Just the résumé bullets, paste-ready |
+| `/recall star <topic>` | One STAR story in rehearsal format |
+
+Every claim in every mode cites a commit, PR, or ticket — tailored, never inflated.
+
+### Health check
+
+```bash
+npx @premdevai/recall doctor
+```
+
+Shows where the skill is installed (and which copy wins), whether it's outdated, and which MCP
+evidence sources are configured — the 5-second answer to "why was my report git-only?".
+
 **Updating.** A skill file is a static copy, not a live link, so updates are pull-based. Re-run
 with the `@latest` tag — the tag is what forces npx past its cache to fetch the newest published
 version; without it you may just re-run a cached copy:
@@ -158,8 +178,6 @@ provider and key. No servers, no telemetry, no account. Your history stays yours
 
 - Additional renderers (PDF, [JSON Resume](https://jsonresume.org))
 - More source adapters (GitLab reviews, PagerDuty, Sentry)
-- Incremental caching for very large repositories
-- Multi-repo aggregation for a full-career view
 
 ## Contributing
 
